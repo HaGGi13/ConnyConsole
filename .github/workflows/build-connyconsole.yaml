@@ -1,7 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build ConnyConsole
 
 on:
   push:
@@ -13,6 +10,9 @@ on:
     - "develop"
     - "master"
   workflow_dispatch:
+
+env:
+  solutionPath: './src/ConnyConsole.sln'
 
 jobs:
   build:
@@ -26,6 +26,6 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore ./src/*.csproj
+      run: dotnet restore ${{ env.solutionPath }}
     - name: Build
-      run: dotnet build --no-restore ./src/*.csproj
+      run: dotnet build --no-restore ${{ env.solutionPath }}
