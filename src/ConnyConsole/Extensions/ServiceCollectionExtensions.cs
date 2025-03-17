@@ -2,7 +2,7 @@ using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace ConnyConsole.Extensions;
 
@@ -11,9 +11,11 @@ public static class ServiceCollectionExtensions
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddConfiguration(this IServiceCollection services, HostBuilderContext hostContext)
     {
-        services.Configure<AppSettings>(hostContext.Configuration.GetSection(AppSettings.SectionName));
+        services.AddSerilog(loggerConfig =>
+            loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
+                .Enrich.FromLogContext());
 
-        services.AddLogging(builder => builder.AddConsole());
+        services.Configure<AppSettings>(hostContext.Configuration.GetSection(AppSettings.SectionName));
 
         services.AddTransient<CancellationTokenFactory>();
         services.AddTransient<App>();
