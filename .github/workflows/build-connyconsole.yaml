@@ -1,4 +1,4 @@
-name: Build and analyze ConnyConsole
+name: Build and analyze
 
 on:
   push:
