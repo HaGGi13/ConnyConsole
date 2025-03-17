@@ -61,7 +61,7 @@ jobs:
         .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
     - name: Build ${{ env.solutionPath }}
       run: dotnet build --no-restore ${{ env.solutionPath }}
-    - name: Build and analyze
+    - name: Run SonarQube analyze
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
