@@ -1,23 +1,12 @@
-﻿// This class function is based on https://medium.com/@sawyer.watts/a-beginners-guide-to-net-s-hostbuilder-part-2-cancellation-857ae3e6ff02
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Infrastructure;
 
-public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> logger) : IDisposable
+/// <inheritdoc/>
+public sealed class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSource> logger)
+    : CancellationTokenSource
 {
-    private bool _gracefulCancel = true;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
-
-    /// <summary>
-    /// Releases the resources used by this <see cref="CancellationTokenSource"/>
-    /// </summary>
-    /// <remarks>
-    /// This method is not thread-safe for any other concurrent calls.
-    /// </remarks>
-    public void Dispose() => _cancellationTokenSource.Dispose();
+    private bool _isGracefulCancelled = true;
 
     /// <summary>
     /// Creates a <see cref="ConsoleCancelEventHandler"/> for a gracefully (first Ctrl+C) or forced (second Ctrl+C) application exit.
@@ -25,18 +14,20 @@ public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> l
     /// </summary>
     /// <param name="timeout">The timeout after which the app is forcibly terminated.</param>
     /// <returns>The configured <see cref="ConsoleCancelEventHandler"/> event.</returns>
-    public ConsoleCancelEventHandler CreateHandler(TimeSpan timeout)
+    /// <remarks>This method is based on https://medium.com/@sawyer.watts/a-beginners-guide-to-net-s-hostbuilder-part-2-cancellation-857ae3e6ff02</remarks>
+    public ConsoleCancelEventHandler CreateCancellationHandler(TimeSpan timeout)
     {
         return (_, cancelEvent) =>
         {
-            if (_gracefulCancel)
+            if (_isGracefulCancelled)
             {
                 logger.LogInformation(
-                    "Received interrupt signal, attempting to shut down gracefully but will force-close in {Seconds} seconds. Send again to immediately force-close.",timeout.TotalSeconds);
+                    "Received interrupt signal, attempting to shut down gracefully but will force-close in {Seconds} seconds. Send again to immediately force-close.",
+                    timeout.TotalSeconds);
 
-                _cancellationTokenSource.Cancel();
+                Cancel();
                 cancelEvent.Cancel = true;
-                _gracefulCancel = false;
+                _isGracefulCancelled = false;
 
                 ForceExitAfterTimeout((int)timeout.TotalMilliseconds);
             }

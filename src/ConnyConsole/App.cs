@@ -8,21 +8,21 @@ namespace ConnyConsole;
 public class App
 {
     private readonly AppSettings _appSettings;
-    private readonly CancellationTokenFactory _cancellationTokenFactory;
+    private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
     private readonly ILogger<App> _logger;
 
-    public App(IOptions<AppSettings> appSettings, CancellationTokenFactory cancellationTokenFactory, ILogger<App> logger)
+    public App(IOptions<AppSettings> appSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource, ILogger<App> logger)
     {
         _appSettings = appSettings.Value;
-        _cancellationTokenFactory = cancellationTokenFactory;
+        _consoleCancellationTokenSource = consoleCancellationTokenSource;
         _logger = logger;
 
-        RegisterCancellation();
+        RegisterConsoleCancellation();
     }
 
     public Task<int> RunAsync()
     {
-        while (!_cancellationTokenFactory.CancellationToken.IsCancellationRequested)
+        while (!_consoleCancellationTokenSource.Token.IsCancellationRequested)
         {
             _logger.LogInformation("I'm working every {LoopOutputInterval} seconds...",
                 _appSettings.LoopOutputInterval.TotalSeconds);
@@ -36,9 +36,9 @@ public class App
         return Task.FromResult(0);
     }
 
-    private void RegisterCancellation()
+    private void RegisterConsoleCancellation()
     {
         Console.CancelKeyPress +=
-            _cancellationTokenFactory.CreateHandler(_appSettings.CancellationTimeout);
+            _consoleCancellationTokenSource.CreateCancellationHandler(_appSettings.CancellationTimeout);
     }
 }

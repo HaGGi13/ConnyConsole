@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
 
         services.Configure<AppSettings>(hostContext.Configuration.GetSection(AppSettings.SectionName));
 
-        services.AddTransient<CancellationTokenFactory>();
+        services.AddTransient<ConsoleCancellationTokenSource>();
         services.AddTransient<App>();
 
         return services;
