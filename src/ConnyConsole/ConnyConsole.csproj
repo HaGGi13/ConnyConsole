@@ -21,7 +21,8 @@
       <None Update="Config\appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Config\appsettings.Development.json">
+      <None Update="Config\appsettings.*.json">
+        <DependentUpon>appsettings.json</DependentUpon>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
