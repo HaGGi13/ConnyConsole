@@ -24,7 +24,7 @@ public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> l
             if (_gracefulCancel)
             {
                 logger.LogInformation(
-                    $"Received interrupt signal, attempting to shut down gracefully but will force-close in {timeout.TotalSeconds} seconds. Send again to immediately force-close.");
+                    "Received interrupt signal, attempting to shut down gracefully but will force-close in {Seconds} seconds. Send again to immediately force-close.",timeout.TotalSeconds);
 
                 _cancellationTokenSource.Cancel();
                 cancelEvent.Cancel = true;
