@@ -3,17 +3,16 @@ using ConnyConsole.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Formatting.Display;
 
-var logger = LoggerFactory.Create(config =>
-        config.AddSimpleConsole(options =>
-        {
-            options.SingleLine = true;
-            options.TimestampFormat = "HH:mm:ss.fff ";
-        }))
-    .CreateLogger<Program>();
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(new MessageTemplateTextFormatter(
+        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}"))
+    .CreateBootstrapLogger();
 
-logger.LogInformation("Starting application...");
+Log.Logger.ForContext<Program>().Information("Starting application");
 
 int exitCode;
 try
@@ -35,10 +34,13 @@ try
 }
 catch (Exception e)
 {
-    logger.LogError(e, "Failed to start application");
+    Log.Logger.ForContext<Program>().Error(e, "Failed to start application");
     exitCode = -1;
 }
-
-logger.LogInformation("Application shutdown.");
+finally
+{
+    Log.Logger.ForContext<Program>().Information("Application shutting down...");
+    Log.CloseAndFlush();
+}
 
 return exitCode;
