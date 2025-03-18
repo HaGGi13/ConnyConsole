@@ -4,12 +4,20 @@ using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Infrastructure;
 
-public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> logger)
+public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> logger) : IDisposable
 {
     private bool _gracefulCancel = true;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
+    /// <summary>
+    /// Releases the resources used by this <see cref="CancellationTokenSource"/>
+    /// </summary>
+    /// <remarks>
+    /// This method is not thread-safe for any other concurrent calls.
+    /// </remarks>
+    public void Dispose() => _cancellationTokenSource.Dispose();
 
     /// <summary>
     /// Creates a <see cref="ConsoleCancelEventHandler"/> for a gracefully (first Ctrl+C) or forced (second Ctrl+C) application exit.
@@ -24,7 +32,7 @@ public sealed class CancellationTokenFactory(ILogger<CancellationTokenFactory> l
             if (_gracefulCancel)
             {
                 logger.LogInformation(
-                    $"Received interrupt signal, attempting to shut down gracefully but will force-close in {timeout.TotalSeconds} seconds. Send again to immediately force-close.");
+                    "Received interrupt signal, attempting to shut down gracefully but will force-close in {Seconds} seconds. Send again to immediately force-close.",timeout.TotalSeconds);
 
                 _cancellationTokenSource.Cancel();
                 cancelEvent.Cancel = true;

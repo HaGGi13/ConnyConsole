@@ -40,7 +40,7 @@ catch (Exception e)
 finally
 {
     Log.Logger.ForContext<Program>().Information("Application shutting down...");
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync().ConfigureAwait(false);
 }
 
 return exitCode;
