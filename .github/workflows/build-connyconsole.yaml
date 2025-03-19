@@ -71,9 +71,9 @@ jobs:
     - name: Prepare SonarQube analyze
       shell: powershell
       run: |
-        .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"${{ env.fullSemVer }}" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+        .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"$GitVersion_FullSemVer" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
 
-    - name: Build ${{ env.solutionPath }} ${{ env.fullSemVer }}
+    - name: Build ${{ env.solutionPath }} $GitVersion_FullSemVer
       run: dotnet build --no-restore ${{ env.solutionPath }}
 
     - name: Run SonarQube analyze
