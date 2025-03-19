@@ -34,7 +34,7 @@ jobs:
       id: version_step # step id used as reference for output values
       uses: gittools/actions/gitversion/command@v3.1.11
       with:
-        arguments: '/output json /l console /config GitVersion.yaml /updateprojectfiles' # have to self-define all arguments; /updateprojectfiles not impl. in execute task
+        arguments: '/output buildserver /l console /config GitVersion.yaml /updateprojectfiles' # have to self-define all arguments; /updateprojectfiles not impl. in execute task
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
