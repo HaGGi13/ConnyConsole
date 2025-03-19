@@ -34,8 +34,6 @@ jobs:
       id: version_step # step id used as reference for output values
       uses: gittools/actions/gitversion/command@v3.1.11
       with:
-        useConfigFile: true
-        configFilePath: GitVersion.yaml # define it specifically, because extension searches for *.yml, not *.yaml
         arguments: '/output json /l console /config GitVersion.yaml /updateprojectfiles' # have to self-define all arguments; /updateprojectfiles not impl. in execute task
 
     - name: Setup .NET
