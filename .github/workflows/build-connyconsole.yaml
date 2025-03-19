@@ -1,5 +1,4 @@
 name: Build and analyze
-run-name: "${{ github.workflow }} ${{ env.fullSemVer }}"
 
 on:
   push:
@@ -77,7 +76,7 @@ jobs:
       run: |
         .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"${{ env.fullSemVer }}" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
 
-    - name: Build ${{ env.solutionPath }}
+    - name: Build ${{ env.solutionPath }} ${{ env.fullSemVer }}
       run: dotnet build --no-restore ${{ env.solutionPath }}
 
     - name: Run SonarQube analyze
