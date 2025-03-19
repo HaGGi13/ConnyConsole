@@ -34,6 +34,7 @@ jobs:
       uses: gittools/actions/gitversion/execute@v3.1.11
       with:
         useConfigFile: true
+        configFilePath: GitVersion.yaml # define it specifically, because extension searches for *.yml, not *.yaml
         updateProjectFiles: true
 
     - name: Setup .NET
