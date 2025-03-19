@@ -32,11 +32,11 @@ jobs:
         versionSpec: '6.0.x'
     - name: Determine Version
       id: version_step # step id used as reference for output values
-      uses: gittools/actions/gitversion/execute@v3.1.11
+      uses: gittools/actions/gitversion/command@v3.1.11
       with:
         useConfigFile: true
         configFilePath: GitVersion.yaml # define it specifically, because extension searches for *.yml, not *.yaml
-        updateProjectFiles: true
+        arguments: '/updateprojectfiles'
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
