@@ -13,6 +13,7 @@ permissions:
   pull-requests: write
 
 env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   solutionPath: './src/ConnyConsole.sln'
 
 jobs:
@@ -28,7 +29,7 @@ jobs:
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v3.1.11
       with:
-        versionSpec: '6.x.x'
+        versionSpec: '6.0.x'
     - name: Determine Version
       id: version_step # step id used as reference for output values
       uses: gittools/actions/gitversion/execute@v3.1.11
@@ -70,8 +71,6 @@ jobs:
       run: dotnet restore ${{ env.solutionPath }}
 
     - name: Prepare SonarQube analyze
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
       run: |
         .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"${{ env.fullSemVer }}" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
@@ -80,8 +79,6 @@ jobs:
       run: dotnet build --no-restore ${{ env.solutionPath }}
 
     - name: Run SonarQube analyze
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: powershell
       run: |
         .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
