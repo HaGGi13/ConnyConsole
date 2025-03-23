@@ -78,7 +78,7 @@ jobs:
       run: dotnet build ${{ env.solutionPath }} --no-restore -c ${{ env.buildConfiguration }}
 
     - name: Test ${{ env.solutionPath }}
-      run: dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="./../../TestResults/"
+      run: dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger "GitHubActions" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="./../../TestResults/"
 
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
