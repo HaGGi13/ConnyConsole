@@ -13,8 +13,8 @@ permissions:
   pull-requests: write
 
 env:
-  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   solutionPath: './src/ConnyConsole.sln'
+  buildConfiguration: 'Release'
 
 jobs:
   build:
@@ -70,11 +70,33 @@ jobs:
 
     - name: Prepare SonarQube analyze
       shell: powershell
-      run: |
-        .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"${{ env.GitVersion_FullSemVer }}" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+      run: >
+        .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /o:"haggi13"
+        /d:sonar.host.url="https://sonarcloud.io"
+        /v:"${{ env.GitVersion_FullSemVer }}"
+        /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml
 
     - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
-      run: dotnet build --no-restore ${{ env.solutionPath }}
+      run: dotnet build ${{ env.solutionPath }} --no-restore -c ${{ env.buildConfiguration }}
+
+    - name: Test ${{ env.solutionPath }}
+      run: >
+        dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }}
+        --logger trx
+        --results-directory "./TestResults/"
+        --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
+        /p:CollectCoverage=true
+        /p:CoverletOutputFormat=opencover
+        /p:CoverletOutput="./../../TestResults/"
+
+    - name: Upload dotnet test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: TestResults
+        path: ./TestResults/
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}
 
     - name: Run SonarQube analyze
       shell: powershell

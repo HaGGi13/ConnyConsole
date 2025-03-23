@@ -3,7 +3,7 @@
 namespace ConnyConsole.Infrastructure;
 
 /// <inheritdoc/>
-public sealed class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSource> logger)
+public class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSource> logger)
     : CancellationTokenSource
 {
     private bool _isGracefulCancelled = true;
@@ -17,6 +17,11 @@ public sealed class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTo
     /// <remarks>This method is based on https://medium.com/@sawyer.watts/a-beginners-guide-to-net-s-hostbuilder-part-2-cancellation-857ae3e6ff02</remarks>
     public ConsoleCancelEventHandler CreateCancellationHandler(TimeSpan timeout)
     {
+        if (timeout < TimeSpan.Zero)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout), timeout, "Timeout must be greater or equal zero");
+        }
+
         return (_, cancelEvent) =>
         {
             if (_isGracefulCancelled)
@@ -29,11 +34,12 @@ public sealed class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTo
                 cancelEvent.Cancel = true;
                 _isGracefulCancelled = false;
 
-                ForceExitAfterTimeout((int)timeout.TotalMilliseconds);
+                EnforceExitAfterTimeout((int)timeout.TotalMilliseconds);
             }
             else
             {
                 logger.LogInformation("Second interrupt received, force-closing the app");
+                ExitApplication();
             }
         };
     }
@@ -41,16 +47,30 @@ public sealed class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTo
     /// <summary>
     /// Waits a defined timeout in milliseconds, afterward enforces the application exit.
     /// </summary>
-    private void ForceExitAfterTimeout(int timeoutInMilliseconds)
+    private void EnforceExitAfterTimeout(int timeoutInMilliseconds)
     {
-        _ = new Timer(
-            _ =>
-            {
-                logger.LogInformation("Timeout reached, force-closing app.");
-                Environment.Exit(0);
-            },
-            state: null,
-            dueTime: timeoutInMilliseconds,
-            period: 0);
+        void LogAndExit()
+        {
+            logger.LogInformation("Timeout reached, force-closing app.");
+            ExitApplication();
+        }
+
+        if (timeoutInMilliseconds > 0)
+        {
+            _ = new Timer(
+                _ => LogAndExit(),
+                state: null,
+                dueTime: timeoutInMilliseconds,
+                period: 0);
+        }
+        else
+        {
+            LogAndExit();
+        }
     }
+
+    /// <summary>
+    /// Terminate current process and return exit code 0 to the operating system.
+    /// </summary>
+    protected virtual void ExitApplication() => Environment.Exit(0);
 }
