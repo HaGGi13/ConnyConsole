@@ -83,6 +83,8 @@ jobs:
     - name: Test ${{ env.solutionPath }}
       run: >
         dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }}
+        --logger trx
+        --results-directory "./TestResults/"
         --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
         /p:CollectCoverage=true
         /p:CoverletOutputFormat=opencover
@@ -91,6 +93,7 @@ jobs:
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
       with:
+        name: TestResults
         path: ./TestResults/
       # Use always() to always run this step to publish test results when there are test failures
       if: ${{ always() }}
