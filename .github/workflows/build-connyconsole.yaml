@@ -15,7 +15,7 @@ permissions:
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   solutionPath: './src/ConnyConsole.sln'
-  builConfiguration: 'Release'
+  buildConfiguration: 'Release'
 
 jobs:
   build:
@@ -77,7 +77,7 @@ jobs:
     - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
       run: dotnet build ${{ env.solutionPath }} --no-restore -c ${{ env.buildConfiguration }}
 
-    - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
+    - name: Test ${{ env.solutionPath }}
       run: dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="./../../TestResults/"
 
     - name: Upload dotnet test results
