@@ -14,7 +14,7 @@ permissions:
 
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  solutionPath: 'ConnyConsole.sln'
+  solutionPath: './src/ConnyConsole.sln'
 
 jobs:
   build:
