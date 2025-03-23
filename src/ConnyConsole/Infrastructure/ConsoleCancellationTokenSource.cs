@@ -49,15 +49,26 @@ public class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSour
     /// </summary>
     private void EnforceExitAfterTimeout(int timeoutInMilliseconds)
     {
-        _ = new Timer(
-            _ =>
-            {
-                logger.LogInformation("Timeout reached, force-closing app.");
-                ExitApplication();
-            },
-            state: null,
-            dueTime: timeoutInMilliseconds,
-            period: 0);
+        if (timeoutInMilliseconds > 0)
+        {
+            _ = new Timer(
+                _ => LogAndExit(),
+                state: null,
+                dueTime: timeoutInMilliseconds,
+                period: 0);
+        }
+        else
+        {
+            LogAndExit();
+        }
+
+        return;
+
+        void LogAndExit()
+        {
+            logger.LogInformation("Timeout reached, force-closing app.");
+            ExitApplication();
+        }
     }
 
     /// <summary>

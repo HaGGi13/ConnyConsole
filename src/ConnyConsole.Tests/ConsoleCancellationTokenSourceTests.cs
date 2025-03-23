@@ -10,7 +10,7 @@ public class ConsoleCancellationTokenSourceTests
 {
     private readonly FakeLogger<ConsoleCancellationTokenSource> _logger = new();
 
-    [Fact(Skip = "Does not properly run and sometimes succeeded and fails - unclear what's the reason.")]
+    [Fact]
     public void CreateCancellationHandler_ShouldLogsMessageAndExit_WhenOneInterruptWithTimeout()
     {
         // Arrange
