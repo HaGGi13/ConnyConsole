@@ -72,10 +72,10 @@ jobs:
       shell: powershell
       run: >
         .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /o:"haggi13"
-          /d:sonar.host.url="https://sonarcloud.io"
-          /v:"${{ env.GitVersion_FullSemVer }}"
-          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml
+        /d:sonar.host.url="https://sonarcloud.io"
+        /v:"${{ env.GitVersion_FullSemVer }}"
+        /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml
 
     - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
       run: dotnet build ${{ env.solutionPath }} --no-restore -c ${{ env.buildConfiguration }}
@@ -83,9 +83,9 @@ jobs:
     - name: Test ${{ env.solutionPath }}
       run: >
         dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger "GitHubActions"
-          /p:CollectCoverage=true
-          /p:CoverletOutputFormat=opencover
-          /p:CoverletOutput="./../../TestResults/"
+        /p:CollectCoverage=true
+        /p:CoverletOutputFormat=opencover
+        /p:CoverletOutput="./../../TestResults/"
 
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
