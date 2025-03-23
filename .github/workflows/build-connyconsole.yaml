@@ -15,6 +15,7 @@ permissions:
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   solutionPath: './src/ConnyConsole.sln'
+  builConfiguration: 'Release'
 
 jobs:
   build:
@@ -74,10 +75,10 @@ jobs:
         .\.sonar\scanner\dotnet-sonarscanner begin /k:"HaGGi13_ConnyConsole" /v:"${{ env.GitVersion_FullSemVer }}" /o:"haggi13" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml
 
     - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
-      run: dotnet build ${{ env.solutionPath }} --no-restore --configuration Release
+      run: dotnet build ${{ env.solutionPath }} --no-restore -c ${{ env.buildConfiguration }}
 
     - name: Build ${{ env.solutionPath }} ${{ env.GitVersion_FullSemVer }}
-      run: dotnet test ${{ env.solutionPath }} --no-build --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="./../../TestResults/"
+      run: dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput="./../../TestResults/"
 
     - name: Upload dotnet test results
       uses: actions/upload-artifact@v4
