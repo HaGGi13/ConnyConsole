@@ -82,7 +82,8 @@ jobs:
 
     - name: Test ${{ env.solutionPath }}
       run: >
-        dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }} --logger "GitHubActions"
+        dotnet test ${{ env.solutionPath }} --no-build -c ${{ env.buildConfiguration }}
+        --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true"
         /p:CollectCoverage=true
         /p:CoverletOutputFormat=opencover
         /p:CoverletOutput="./../../TestResults/"
