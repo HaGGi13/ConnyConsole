@@ -15,7 +15,7 @@ public class ConsoleCancellationTokenSourceTests
     {
         // Arrange
         using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
-        var consoleCancelEventArgs = (ConsoleCancelEventArgs)CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
+        var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
         // Timout set to 0 for immediate timeout simulation
@@ -40,7 +40,7 @@ public class ConsoleCancellationTokenSourceTests
     {
         // Arrange
         using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
-        var consoleCancelEventArgs = (ConsoleCancelEventArgs)CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
+        var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
         // Timout set to 3 to test case w/o timeout situation
@@ -64,7 +64,7 @@ public class ConsoleCancellationTokenSourceTests
     {
         // Arrange
         using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
-        var consoleCancelEventArgs = (ConsoleCancelEventArgs)CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
+        var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
         var handler = tokenSource.CreateCancellationHandler(TimeSpan.FromSeconds(3));
@@ -131,10 +131,11 @@ public class ConsoleCancellationTokenSourceTests
 
     #endregion
 
-    private static object CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
+    private static ConsoleCancelEventArgs CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
     {
-        var type = typeof(ConsoleCancelEventArgs);
-        var constructor = type.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
-        return constructor.Invoke([key]);
+        var consoleCancelEventArgsType = typeof(ConsoleCancelEventArgs);
+        var constructor = consoleCancelEventArgsType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+
+        return (ConsoleCancelEventArgs)constructor.Invoke([key]);
     }
 }
