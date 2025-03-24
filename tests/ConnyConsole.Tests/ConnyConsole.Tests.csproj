@@ -45,7 +45,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ConnyConsole\ConnyConsole.csproj" />
+      <ProjectReference Include="..\..\src\ConnyConsole\ConnyConsole.csproj" />
     </ItemGroup>
 
 </Project>

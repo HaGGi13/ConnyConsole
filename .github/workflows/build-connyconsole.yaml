@@ -13,7 +13,7 @@ permissions:
   pull-requests: write
 
 env:
-  solutionPath: './src/ConnyConsole.sln'
+  solutionPath: './ConnyConsole.sln'
   buildConfiguration: 'Release'
 
 jobs:

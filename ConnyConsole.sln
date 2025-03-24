@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnyConsole", "ConnyConsole/ConnyConsole.csproj", "{88969CC9-34FC-4668-902F-9D5354CE92E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnyConsole", "src/ConnyConsole/ConnyConsole.csproj", "{88969CC9-34FC-4668-902F-9D5354CE92E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnyConsole.Tests", "ConnyConsole.Tests\ConnyConsole.Tests.csproj", "{2A4024A7-B57F-4412-9ABF-12294591C2F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConnyConsole.Tests", "tests/ConnyConsole.Tests\ConnyConsole.Tests.csproj", "{2A4024A7-B57F-4412-9ABF-12294591C2F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
