@@ -1,8 +1,11 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using ConnyConsole.Cli.Commands;
+using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Testing;
 using Microsoft.Extensions.Options;
 
@@ -27,23 +30,44 @@ public class AppTests
     }
 
     [Fact]
-    public async Task RunAsync_ShouldLogAndExit_WhenCancellationIsRequested()
+    public async Task RunAsync_ValidParameter_ExitCodeZero()
     {
         // Arrange
+        var services = new ServiceCollection().AddFakeLogging().AddCliParser().BuildServiceProvider();
+        var rootCommand = services.GetRequiredService<CliRootCommand>();
         var logger = new FakeLogger<App>();
-        var app = new App(_options, _consoleCancellationTokenSource, logger);
+
+        var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);
 
         // Act
-        var runTask = Task.Run(async () => await app.RunAsync().ConfigureAwait(false));
-        await Task.Delay(100); // Allow some loops to execute
-        await _consoleCancellationTokenSource.CancelAsync(); // Simulate cancellation
+        var runTask = Task.Run(async () => await app.RunAsync(["log", "test message"]).ConfigureAwait(false));
         var result = await runTask.ConfigureAwait(true); // Wait for completion
 
         // Assert
-        result.Should().Be(0);
-
         var logMessages = logger.Collector.GetSnapshot();
-        logMessages[0].Message.Should().StartWith("I'm working");
-        logMessages[^1].Message.Should().Be("Bye bye!");
+        logMessages[0].Message.Should().StartWith("Start processing commands...");
+
+        result.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task RunAsync_InvalidArguments_RetrunErrorCodeOne()
+    {
+        // Arrange
+        var services = new ServiceCollection().AddFakeLogging().AddCliParser().BuildServiceProvider();
+        var rootCommand = services.GetRequiredService<CliRootCommand>();
+        var logger = new FakeLogger<App>();
+
+        var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);
+
+        // Act
+        var runTask = Task.Run(async () => await app.RunAsync(["foo", "bar"]).ConfigureAwait(false));
+        var result = await runTask.ConfigureAwait(true); // Wait for completion
+
+        // Assert
+        var logMessages = logger.Collector.GetSnapshot();
+        logMessages[0].Message.Should().StartWith("Start processing commands...");
+
+        result.Should().Be(1);
     }
 }

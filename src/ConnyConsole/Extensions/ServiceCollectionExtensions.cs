@@ -1,7 +1,10 @@
+using ConnyConsole.Cli.Arguments;
+using ConnyConsole.Cli.Commands;
+using ConnyConsole.Cli.Options;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace ConnyConsole.Extensions;
@@ -9,16 +12,39 @@ namespace ConnyConsole.Extensions;
 public static class ServiceCollectionExtensions
 {
     // ReSharper disable once UnusedMethodReturnValue.Global
-    public static IServiceCollection AddConfiguration(this IServiceCollection services, HostBuilderContext hostContext)
+    public static IServiceCollection AddSerilog(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSerilog(loggerConfig =>
-            loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
+            loggerConfig.ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext());
 
-        services.Configure<AppSettings>(hostContext.Configuration.GetSection(AppSettings.SectionName));
+        return services;
+    }
 
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IServiceCollection AddSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<AppSettings>(configuration.GetSection(AppSettings.SectionName));
+
+        return services;
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
         services.AddTransient<ConsoleCancellationTokenSource>();
-        services.AddTransient<App>();
+        services.AddTransient<IApp, App>();
+
+        return services;
+    }
+
+    // ReSharper disable once UnusedMethodReturnValue.Global
+    public static IServiceCollection AddCliParser(this IServiceCollection services)
+    {
+        services.AddTransient<MessageArgument>();
+        services.AddTransient<CategoryOption>();
+        services.AddTransient<LogCommand>();
+        services.AddTransient<CliRootCommand>();
 
         return services;
     }
