@@ -1,39 +1,35 @@
-﻿using ConnyConsole.Infrastructure;
+﻿using System.CommandLine;
+using ConnyConsole.Cli.Commands;
+using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace ConnyConsole;
 
-public class App
+public sealed class App : IApp
 {
     private readonly AppSettings _appSettings;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
+    private readonly CliRootCommand _rootCommand;
     private readonly ILogger<App> _logger;
 
-    public App(IOptions<AppSettings> appSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource, ILogger<App> logger)
+    public App(IOptions<AppSettings> appSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource,
+         CliRootCommand rootCommand, ILogger<App> logger)
     {
         _appSettings = appSettings.Value;
         _consoleCancellationTokenSource = consoleCancellationTokenSource;
+        _rootCommand = rootCommand;
         _logger = logger;
 
         RegisterConsoleCancellation();
     }
 
-    public Task<int> RunAsync()
+    public Task<int> RunAsync(string[] arguments)
     {
-        while (!_consoleCancellationTokenSource.Token.IsCancellationRequested)
-        {
-            _logger.LogInformation("I'm working every {LoopOutputInterval} seconds...",
-                _appSettings.LoopOutputInterval.TotalSeconds);
+        _logger.LogDebug("Start processing commands...");
 
-            // just some dirty pseudo work
-            Thread.Sleep(_appSettings.LoopOutputInterval);
-        }
-
-        _logger.LogInformation("Bye bye!");
-
-        return Task.FromResult(0);
+        return _rootCommand.InvokeAsync(arguments);
     }
 
     private void RegisterConsoleCancellation()

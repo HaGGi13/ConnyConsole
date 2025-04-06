@@ -12,7 +12,7 @@ Log.Logger = new LoggerConfiguration()
         "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}"))
     .CreateBootstrapLogger();
 
-Log.Logger.ForContext<Program>().Information("Starting application");
+Log.Logger.ForContext<Program>().Debug("Starting application");
 
 int exitCode;
 try
@@ -26,11 +26,17 @@ try
             hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
                 reloadOnChange: true);
         })
-        .ConfigureServices((hostContext, services) => services.AddConfiguration(hostContext))
+        .ConfigureServices((hostContext, services) =>
+        {
+            services.AddSerilog(hostContext.Configuration);
+            services.AddSettings(hostContext.Configuration);
+            services.AddServices();
+            services.AddCliParser();
+        })
         .Build();
 
-    var app = host.Services.GetRequiredService<App>();
-    exitCode = await app.RunAsync().ConfigureAwait(false);
+    var app = host.Services.GetRequiredService<IApp>();
+    exitCode = await app.RunAsync(args).ConfigureAwait(false);
 }
 catch (Exception e)
 {
@@ -39,7 +45,7 @@ catch (Exception e)
 }
 finally
 {
-    Log.Logger.ForContext<Program>().Information("Application shutting down...");
+    Log.Logger.ForContext<Program>().Debug("Application shutting down...");
     await Log.CloseAndFlushAsync().ConfigureAwait(false);
 }
 
