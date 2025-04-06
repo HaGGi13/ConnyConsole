@@ -5,7 +5,7 @@ namespace ConnyConsole.Cli.Options;
 
 public sealed class CategoryOption : Option<LogLevel>
 {
-    public CategoryOption() : base(name: "--cat",
+    public CategoryOption() : base(name: "--category",
         description: "The log category.",
         getDefaultValue: () => LogLevel.Information)
     {
