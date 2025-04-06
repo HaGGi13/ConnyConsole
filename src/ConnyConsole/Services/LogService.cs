@@ -26,8 +26,6 @@ public sealed class LogService<T>(ILogger<T> logger) : ILogService<T> where T : 
             case LogLevel.Trace:
                 logger.LogTrace("{logMessage}", logMessage);
                 break;
-            case LogLevel.None:
-            case LogLevel.Information:
             default:
                 logger.LogInformation("{logMessage}", logMessage);
                 break;
