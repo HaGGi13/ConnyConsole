@@ -2,7 +2,7 @@
 
 namespace ConnyConsole.Cli.Commands;
 
-public class CliRootCommand : RootCommand
+public sealed class CliRootCommand : RootCommand
 {
     public CliRootCommand(LogCommand logCommand) : base("ConnyConsole - an example implementation")
     {

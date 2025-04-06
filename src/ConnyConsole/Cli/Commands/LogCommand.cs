@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Cli.Commands;
 
-public class LogCommand : Command
+public sealed class LogCommand : Command
 {
     private readonly ILogger<LogCommand> _logger;
 

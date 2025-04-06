@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace ConnyConsole;
 
-public class App : IApp
+public sealed class App : IApp
 {
     private readonly AppSettings _appSettings;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
