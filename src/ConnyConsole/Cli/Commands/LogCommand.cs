@@ -1,51 +1,30 @@
 ﻿using System.CommandLine;
 using ConnyConsole.Cli.Arguments;
 using ConnyConsole.Cli.Options;
+using ConnyConsole.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Cli.Commands;
 
 public sealed class LogCommand : Command
 {
-    private readonly ILogger<LogCommand> _logger;
+    private readonly ILogService<LogCommand> _logService;
 
-    public LogCommand(MessageArgument messageArgument, CategoryOption categoryOption, ILogger<LogCommand> logger)
+    public LogCommand(MessageArgument messageArgument, CategoryOption categoryOption, ILogService<LogCommand> logService)
         : base("log", "Writes a message to the logs.")
     {
-        _logger = logger;
+        _logService = logService;
 
         AddAlias("l");
 
         AddArgument(messageArgument);
         AddOption(categoryOption);
 
-        this.SetHandler(Handle, messageArgument, categoryOption);
+        this.SetHandler(Handle, categoryOption, messageArgument);
     }
 
-    private void Handle(string message, LogLevel level)
+    private void Handle(LogLevel level, string message)
     {
-        switch (level)
-        {
-            case LogLevel.Error:
-                _logger.LogError(message);
-                break;
-            case LogLevel.Warning:
-                _logger.LogWarning(message);
-                break;
-            case LogLevel.Trace:
-                _logger.LogTrace(message);
-                break;
-            case LogLevel.Debug:
-                _logger.LogDebug(message);
-                break;
-            case LogLevel.Critical:
-                _logger.LogCritical(message);
-                break;
-            case LogLevel.None:
-            case LogLevel.Information:
-            default:
-                _logger.LogInformation(message);
-                break;
-        }
+        _logService.Log(level, message);
     }
 }

@@ -3,6 +3,7 @@ using AutoFixture.AutoNSubstitute;
 using ConnyConsole.Cli.Commands;
 using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
+using ConnyConsole.Services;
 using ConnyConsole.Settings;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ public class AppTests
 {
     private readonly IOptions<AppSettings> _options;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
+    private readonly IServiceProvider _services;
 
     public AppTests()
     {
@@ -27,14 +29,19 @@ public class AppTests
 
         var fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _consoleCancellationTokenSource = fixture.Create<ConsoleCancellationTokenSource>();
+
+        _services = new ServiceCollection()
+            .AddFakeLogging()
+            .AddTransient(typeof(ILogService<>), typeof(LogService<>))
+            .AddCliParser()
+            .BuildServiceProvider();
     }
 
     [Fact]
     public async Task RunAsync_ValidParameter_ExitCodeZero()
     {
         // Arrange
-        var services = new ServiceCollection().AddFakeLogging().AddCliParser().BuildServiceProvider();
-        var rootCommand = services.GetRequiredService<CliRootCommand>();
+        var rootCommand = _services.GetRequiredService<CliRootCommand>();
         var logger = new FakeLogger<App>();
 
         var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);
@@ -51,11 +58,10 @@ public class AppTests
     }
 
     [Fact]
-    public async Task RunAsync_InvalidArguments_RetrunErrorCodeOne()
+    public async Task RunAsync_InvalidArguments_ReturnErrorCodeOne()
     {
         // Arrange
-        var services = new ServiceCollection().AddFakeLogging().AddCliParser().BuildServiceProvider();
-        var rootCommand = services.GetRequiredService<CliRootCommand>();
+        var rootCommand = _services.GetRequiredService<CliRootCommand>();
         var logger = new FakeLogger<App>();
 
         var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);

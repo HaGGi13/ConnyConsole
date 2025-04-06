@@ -2,6 +2,7 @@ using ConnyConsole.Cli.Arguments;
 using ConnyConsole.Cli.Commands;
 using ConnyConsole.Cli.Options;
 using ConnyConsole.Infrastructure;
+using ConnyConsole.Services;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddTransient<ConsoleCancellationTokenSource>();
+        services.AddTransient(typeof(ILogService<>), typeof(LogService<>));
         services.AddTransient<IApp, App>();
 
         return services;

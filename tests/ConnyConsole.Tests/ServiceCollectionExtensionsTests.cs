@@ -163,7 +163,7 @@ public class ServiceCollectionExtensionsTests
     public void AddCliParser_RegistersCliRootCommand_Successfully()
     {
         // Arrange
-        // nothing to do - already happen in ctor
+        _services.AddServices();
 
         // Act
         _services.AddCliParser();
@@ -253,7 +253,7 @@ public class ServiceCollectionExtensionsTests
     public void AddCliParser_RegistersLogCommand_Successfully()
     {
         // Arrange
-        // nothing to do - already happen in ctor
+        _services.AddServices();
 
         // Act
         _services.AddCliParser();
