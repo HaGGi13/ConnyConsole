@@ -6,7 +6,7 @@ using ConnyConsole.Cli.Options;
 using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
-using ConnyConsole.Tests.Extensions;
+using ConnyConsole.Tests.TestExtensions;
 using ConnyConsole.Tests.TestHelpers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace ConnyConsole.Tests;
+namespace ConnyConsole.Tests.Extensions;
 
 public class ServiceCollectionExtensionsTests
 {

@@ -5,29 +5,31 @@ namespace ConnyConsole.Services;
 /// <inheritdoc cref="ILogService{T}"/>
 public sealed class LogService<T>(ILogger<T> logger) : ILogService<T> where T : class
 {
-    public void Log(LogLevel level, string message)
+    public void Log(LogLevel level, string? message)
     {
+        var logMessage = message ?? string.Empty;
+
         switch (level)
         {
+            case LogLevel.Critical:
+                logger.LogCritical("{logMessage}", logMessage);
+                break;
             case LogLevel.Error:
-                logger.LogError(message);
+                logger.LogError("{logMessage}", logMessage);
                 break;
             case LogLevel.Warning:
-                logger.LogWarning(message);
-                break;
-            case LogLevel.Trace:
-                logger.LogTrace(message);
+                logger.LogWarning("{logMessage}", logMessage);
                 break;
             case LogLevel.Debug:
-                logger.LogDebug(message);
+                logger.LogDebug("{logMessage}", logMessage);
                 break;
-            case LogLevel.Critical:
-                logger.LogCritical(message);
+            case LogLevel.Trace:
+                logger.LogTrace("{logMessage}", logMessage);
                 break;
             case LogLevel.None:
             case LogLevel.Information:
             default:
-                logger.LogInformation(message);
+                logger.LogInformation("{logMessage}", logMessage);
                 break;
         }
     }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace ConnyConsole.Tests.Extensions;
+namespace ConnyConsole.Tests.TestExtensions;
 
 internal static class ServiceCollectionExtensions
 {

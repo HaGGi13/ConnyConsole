@@ -13,5 +13,5 @@ public interface ILogService<T> where T : class
     /// </summary>
     /// <param name="level">The message's log level.</param>
     /// <param name="message">The message to log.</param>
-    void Log(LogLevel level, string message);
+    void Log(LogLevel level, string? message);
 }

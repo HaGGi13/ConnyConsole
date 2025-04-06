@@ -4,7 +4,7 @@ using ConnyConsole.Tests.TestHelpers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Testing;
 
-namespace ConnyConsole.Tests;
+namespace ConnyConsole.Tests.Infrastructure;
 
 public class ConsoleCancellationTokenSourceTests
 {
