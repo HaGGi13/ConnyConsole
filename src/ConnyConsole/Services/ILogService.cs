@@ -5,8 +5,7 @@ namespace ConnyConsole.Services;
 /// <summary>
 /// Provides log capabilities.
 /// </summary>
-/// <typeparam name="T">Type of class that uses the log service.</typeparam>
-public interface ILogService<T> where T : class
+public interface ILogService
 {
     /// <summary>
     /// Logs a message with the defined <see cref="LogLevel"/>

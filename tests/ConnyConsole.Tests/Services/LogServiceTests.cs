@@ -9,7 +9,7 @@ public class LogServiceTests
 {
     private const string TestMessage = "Test message.";
 
-    private readonly FakeLogger<LogServiceTests> _logger = new();
+    private readonly FakeLogger<LogService> _logger = new();
 
     #region Log - LogLevel checks
 
@@ -17,7 +17,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelCritical_LogsMessageWithLevelCritical()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Critical, TestMessage);
@@ -34,7 +34,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelError_LogsMessageWithLevelError()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Error, TestMessage);
@@ -51,7 +51,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelWarning_LogsMessageWithLevelWarning()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Warning, TestMessage);
@@ -68,7 +68,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelDebug_LogsMessageWithLevelDebug()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Debug, TestMessage);
@@ -85,7 +85,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelTrace_LogsMessageWithLevelTrace()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Trace, TestMessage);
@@ -102,7 +102,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelNone_LogsMessageWithLevelInformation()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.None, TestMessage);
@@ -119,7 +119,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelInformation_LogsMessageWithLevelInformation()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Information, TestMessage);
@@ -136,7 +136,7 @@ public class LogServiceTests
     public void Log_MessageWithLevelInformationNumber_LogsMessageWithLevelInformation()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log((LogLevel)2, TestMessage);
@@ -157,7 +157,7 @@ public class LogServiceTests
     public void Log_NullMessage_LogsEmptyMessage()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Information, null!);
@@ -174,7 +174,7 @@ public class LogServiceTests
     public void Log_EmptyMessage_LogsEmptyMessage()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Information, string.Empty);
@@ -191,7 +191,7 @@ public class LogServiceTests
     public void Log_WhiteSpacesMessage_LogsWhiteSpacesMessage()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Information, "   ");
@@ -208,7 +208,7 @@ public class LogServiceTests
     public void Log_MessageWithNewLine_LogsMessageWithNewLine()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
 
         // Act
         logService.Log(LogLevel.Information, Environment.NewLine);
@@ -225,7 +225,7 @@ public class LogServiceTests
     public void Log_LeadingAndTrailingWhitespacesMessage_LogsMessageWithLeadingAndTrailingWhitespaces()
     {
         // Arrange
-        var logService = new LogService<LogServiceTests>(_logger);
+        var logService = new LogService(_logger);
         var message = $"   {TestMessage}   ";
 
         // Act

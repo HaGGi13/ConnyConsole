@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddTransient<ConsoleCancellationTokenSource>();
-        services.AddTransient(typeof(ILogService<>), typeof(LogService<>));
+        services.AddTransient<ILogService, LogService>();
         services.AddTransient<IApp, App>();
 
         return services;
