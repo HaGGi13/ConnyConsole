@@ -32,7 +32,7 @@ public class AppTests
 
         _services = new ServiceCollection()
             .AddFakeLogging()
-            .AddTransient(typeof(ILogService<>), typeof(LogService<>))
+            .AddTransient<ILogService, LogService>()
             .AddCliParser()
             .BuildServiceProvider();
     }

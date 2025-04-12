@@ -2,8 +2,8 @@
 
 namespace ConnyConsole.Services;
 
-/// <inheritdoc cref="ILogService{T}"/>
-public sealed class LogService<T>(ILogger<T> logger) : ILogService<T> where T : class
+/// <inheritdoc cref="ILogService"/>
+public sealed class LogService(ILogger<LogService> logger) : ILogService
 {
     private const string MessageTemplate = "{Message}";
 
@@ -11,6 +11,7 @@ public sealed class LogService<T>(ILogger<T> logger) : ILogService<T> where T : 
     {
         var logMessage = message ?? string.Empty;
 
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault - is marked by SonarQube rule csharpsquid:S3458
         switch (level)
         {
             case LogLevel.Critical:
