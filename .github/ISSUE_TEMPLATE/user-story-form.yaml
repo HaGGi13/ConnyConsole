@@ -1,0 +1,39 @@
+﻿name: User Story
+description: Create a user story. (A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user.)
+title: "[US]: "
+labels: ["enhancement"]
+projects: ["HaGGi13/2"]
+assignees:
+  - HaGGi13
+body:
+  - type: markdown
+    attributes:
+      value: |
+        In any case of more information is needed how to write a user story, feel free to check [Atlassian's article: User stories with examples and a template](https://www.atlassian.com/agile/project-management/user-stories)
+  - type: textarea
+    id: story-description
+    attributes:
+      label: Description
+      description: "Follow the common user story pattern (As a <persona>, I want to <desire>, so that <benefit>) to make very clear what is your desire and the benefit."
+      placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
+    validations:
+      required: true
+  - type: textarea
+    id: story-acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      placeholder: |
+        I see (that):
+        - <criteria-1>
+        - <criteria-2>
+        - <criteria-3>
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: story-remarks
+    attributes:
+      label: Description
+      description: "Feel free to add any remarks according implementation or side-notes that may help during the implementation. Please consider that this does not guaranteed that they will be respected or the implementation is done the described way."
+      placeholder: "Example: Mind to update the documentation..."
