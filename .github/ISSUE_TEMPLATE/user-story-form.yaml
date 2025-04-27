@@ -11,7 +11,7 @@ body:
     id: story-description
     attributes:
       label: Description
-      description: "Follow the common user story pattern (_As a <persona>, I want to <desire>, so that <benefit>._) to make very clear what is your desire and the benefit."
+      description: "Follow the common user story pattern (_As a &lt;persona&gt;, I want to &lt;desire&gt;, so that &lt;benefit&gt;._) to make very clear what is your desire and the benefit."
       placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
     validations:
       required: true
