@@ -8,18 +8,18 @@ body:
     attributes:
       value: "In any case of more information is needed how to write a user story, feel free to check [Atlassian article: User stories with examples and a template](https://www.atlassian.com/agile/project-management/user-stories)."
   - type: textarea
-    id: story-description
+    id: user-story-description
     attributes:
-      label: Description
+      label: "User Story Description"
       description: "Follow the common user story pattern to make very clear what is your desire and the benefit.<br />_As a &lt;persona&gt;, I want to &lt;desire&gt;, so that &lt;benefit&gt;._"
       placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
       value: "As a <persona>, I want to <desire>, so that <benefit>."
     validations:
       required: true
   - type: textarea
-    id: story-acceptance-criteria
+    id: user-story-acceptance-criteria
     attributes:
-      label: Acceptance criteria
+      label: "Acceptance criteria"
       description: "Acceptance criteria are clear, testable conditions that define when a user story or feature is considered complete and working as intended."
       placeholder: |
         I see (that):
@@ -33,8 +33,8 @@ body:
     validations:
       required: true
   - type: textarea
-    id: story-remarks
+    id: user-story-remarks
     attributes:
-      label: Remarks
+      label: "Remarks"
       description: "Feel free to add any remarks according implementation or side-notes that may help during the implementation.<br />Please consider that this does not guaranteed that they will be respected or the implementation is done the described way."
       placeholder: "Example: Mind to update the documentation..."
