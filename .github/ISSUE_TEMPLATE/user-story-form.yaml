@@ -13,6 +13,7 @@ body:
       label: Description
       description: "Follow the common user story pattern to make very clear what is your desire and the benefit.<br />_As a &lt;persona&gt;, I want to &lt;desire&gt;, so that &lt;benefit&gt;._"
       placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
+      value: "As a <persona>, I want to <desire>, so that <benefit>."
     validations:
       required: true
   - type: textarea
@@ -26,6 +27,9 @@ body:
         - <criteria-2>
         - <criteria-3>
         - ...
+      value: |
+        I see (that):
+        - <criteria>
     validations:
       required: true
   - type: textarea
