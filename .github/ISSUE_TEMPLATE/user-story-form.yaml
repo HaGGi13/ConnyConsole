@@ -1,5 +1,5 @@
 ﻿name: User Story
-description: "Create a user story.\nA user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user."
+description: "Create a user story.<br />A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user."
 title: "[US]: "
 labels: ["enhancement"]
 projects: ["HaGGi13/2"]
@@ -11,7 +11,7 @@ body:
     id: story-description
     attributes:
       label: Description
-      description: "Follow the common user story pattern to make very clear what is your desire and the benefit.\n_As a &lt;persona&gt;, I want to &lt;desire&gt;, so that &lt;benefit&gt;._"
+      description: "Follow the common user story pattern to make very clear what is your desire and the benefit.<br />_As a &lt;persona&gt;, I want to &lt;desire&gt;, so that &lt;benefit&gt;._"
       placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
     validations:
       required: true
@@ -32,5 +32,5 @@ body:
     id: story-remarks
     attributes:
       label: Remarks
-      description: "Feel free to add any remarks according implementation or side-notes that may help during the implementation.\nPlease consider that this does not guaranteed that they will be respected or the implementation is done the described way."
+      description: "Feel free to add any remarks according implementation or side-notes that may help during the implementation.<br />Please consider that this does not guaranteed that they will be respected or the implementation is done the described way."
       placeholder: "Example: Mind to update the documentation..."
