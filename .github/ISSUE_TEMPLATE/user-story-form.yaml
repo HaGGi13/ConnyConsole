@@ -1,7 +1,5 @@
 ﻿name: User Story
-description: |
-  Create a user story.
-  A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user.
+description: Create a user story. A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user.
 title: "[US]: "
 labels: ["enhancement"]
 projects: ["HaGGi13/2"]
