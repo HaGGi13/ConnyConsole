@@ -1,5 +1,5 @@
 ﻿name: User Story
-description: Create a user story. A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user.
+description: Create a user story.  A user story is a simple description of a software feature from the user's point of view. It explains how the feature will benefit the customer/user.
 title: "[US]: "
 labels: ["enhancement"]
 projects: ["HaGGi13/2"]
@@ -12,7 +12,7 @@ body:
     id: story-description
     attributes:
       label: Description
-      description: "Follow the common user story pattern (_As a \<persona\>, I want to \<desire\>, so that \<benefit\>._) to make very clear what is your desire and the benefit."
+      description: "Follow the common user story pattern (_As a `<persona`>, I want to `<desire`>, so that `<benefit`>._) to make very clear what is your desire and the benefit."
       placeholder: "As a <persona>, I want to <desire>, so that <benefit>."
     validations:
       required: true
