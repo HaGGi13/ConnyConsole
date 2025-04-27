@@ -20,7 +20,7 @@ body:
     id: story-acceptance-criteria
     attributes:
       label: Acceptance criteria
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: 'Acceptance criteria are clear, testable conditions that define when a user story or feature is considered complete and working as intended.'
       placeholder: |
         I see (that):
         - <criteria-1>
