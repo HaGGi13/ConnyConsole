@@ -1,6 +1,6 @@
 ﻿---
-name: 🐞 Bug
-about: File a bug/issue
+name: Bug report
+about: Create a report to help us improve
 title: '[BUG]: <title>'
 labels: Bug, Needs Triage
 assignees: ''
@@ -12,10 +12,10 @@ Note: Please search to see if an issue already exists for the bug you encountere
 -->
 
 ### Current Behavior:
-<!-- A concise description of what you're experiencing. -->
+<!-- A clear and concise description of what you're experiencing that is the bug. -->
 
 ### Expected Behavior:
-<!-- A concise description of what you expected to happen. -->
+<!-- A clear and concise description of what you expected to happen. -->
 
 ### Steps To Reproduce:
 <!--
