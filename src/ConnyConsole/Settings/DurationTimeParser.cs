@@ -16,6 +16,33 @@ public static partial class DurationTimeParser
 
     private static readonly Regex TimeRegex = CombinedTimeMyRegex();
 
+    /// <summary>
+    /// Tries to parse a given input string into a <see cref="TimeSpan"/> representation.
+    /// Supports standard duration format and human-readable duration format.
+    /// </summary>
+    /// <param name="input">The input string that represents a duration in a valid format.</param>
+    /// <param name="timeSpan">The parsed <see cref="TimeSpan"/> value if parsing is successful; otherwise <see cref="TimeSpan.Zero"/>.</param>
+    /// <returns><c>true</c> if the input string was successfully parsed into a valid <see cref="TimeSpan"/>; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// Supports two format types:
+    /// <para>
+    /// 1. Standard duration format:<br/>
+    ///    - [d.]HH:mm:ss[.fff]<br/>
+    /// 2. Human-readable format with combinations of:<br/>
+    ///    - days: "1d", "2 days"<br/>
+    ///    - hours: "1h", "2 hours"<br/>
+    ///    - minutes: "1m", "5 minutes"<br/>
+    ///    - seconds: "1s", "30 seconds"<br/>
+    ///    - milliseconds: "100ms", "500 milliseconds"<br/>
+    /// <br/>
+    /// Examples of valid human-readable formats:<br/>
+    /// - "1s"<br/>
+    /// - "5 minutes"<br/>
+    /// - "3m 10s"<br/>
+    /// - "1 hour 30 minutes"<br/>
+    /// - "2 days 4 hours 15m 30s"<br/>
+    ///</para>
+    /// </remarks>
     public static bool TryParse(string? input, out TimeSpan timeSpan)
     {
         timeSpan = TimeSpan.Zero;
