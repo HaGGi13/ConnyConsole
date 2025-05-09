@@ -1,5 +1,7 @@
-﻿using ConnyConsole;
+﻿using System.IO.Abstractions;
+using ConnyConsole;
 using ConnyConsole.Extensions;
+using ConnyConsole.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +26,8 @@ try
 
             hostConfig.AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true);
             hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
+                reloadOnChange: true);
+            hostConfig.AddJsonFile(AppSettings.GetSystemConfigFilePath(new FileSystem()), optional: true,
                 reloadOnChange: true);
         })
         .ConfigureServices((hostContext, services) =>

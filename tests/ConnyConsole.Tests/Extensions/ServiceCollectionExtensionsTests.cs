@@ -1,8 +1,7 @@
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ConnyConsole.Cli.Arguments;
-using ConnyConsole.Cli.Commands;
-using ConnyConsole.Cli.Options;
+using ConnyConsole.Cli;
+using ConnyConsole.Cli.Log;
 using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
@@ -70,7 +69,7 @@ public class ServiceCollectionExtensionsTests
     {
         // Arrange
         _hostBuilderContext.Configuration["AppSettings:LoopOutputInterval"] = "00:00:13";
-        _hostBuilderContext.Configuration["AppSettings:CancellationTimeout"] = "00:00:05";
+        _hostBuilderContext.Configuration["AppSettings:Cancellation:Timeout"] = "00:00:05";
 
         // Act
         _services.AddSettings(_hostBuilderContext.Configuration);
@@ -82,7 +81,7 @@ public class ServiceCollectionExtensionsTests
         options.Should().NotBeNull();
         options.Value.Should().NotBeNull();
         options.Value.LoopOutputInterval.Should().Be(TimeSpan.FromSeconds(13));
-        options.Value.CancellationTimeout.Should().Be(TimeSpan.FromSeconds(5));
+        options.Value.Cancellation.Timeout.Should().Be(TimeSpan.FromSeconds(5));
     }
 
     #endregion

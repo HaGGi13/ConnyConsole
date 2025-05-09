@@ -1,6 +1,7 @@
-using ConnyConsole.Cli.Arguments;
-using ConnyConsole.Cli.Commands;
-using ConnyConsole.Cli.Options;
+using System.IO.Abstractions;
+using ConnyConsole.Cli;
+using ConnyConsole.Cli.Config;
+using ConnyConsole.Cli.Log;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
@@ -26,6 +27,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<AppSettings>(configuration.GetSection(AppSettings.SectionName));
+        services.Configure<CancellationSettings>(configuration.GetSection($"{AppSettings.SectionName}:{CancellationSettings.SectionName}"));
 
         return services;
     }
@@ -33,8 +35,10 @@ public static class ServiceCollectionExtensions
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
+        services.AddTransient<IFileSystem, FileSystem>();
         services.AddTransient<ConsoleCancellationTokenSource>();
         services.AddTransient<ILogService, LogService>();
+        services.AddTransient<IConfigurationEditor, JsonConfigurationEditor>();
         services.AddTransient<IApp, App>();
 
         return services;
@@ -43,9 +47,19 @@ public static class ServiceCollectionExtensions
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddCliParser(this IServiceCollection services)
     {
+        // Arguments
         services.AddTransient<MessageArgument>();
+        services.AddTransient<SettingKeyArgument>();
+        services.AddTransient<SettingValueArgument>();
+
+        // Options
         services.AddTransient<CategoryOption>();
+
+        // Commands
         services.AddTransient<LogCommand>();
+        services.AddTransient<SetConfigCommand>();
+        services.AddTransient<ConfigCommand>();
+
         services.AddTransient<CliRootCommand>();
 
         return services;
