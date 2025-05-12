@@ -1,36 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <ApplicationIcon>..\..\assets\icons\app-icon.ico</ApplicationIcon>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>..\..\assets\icons\app-icon.ico</ApplicationIcon>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3" />
-      <PackageReference Include="Serilog" Version="4.2.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
-      <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-      <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-      <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-      <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.14" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.3"/>
+    <PackageReference Include="Serilog" Version="4.2.0"/>
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0"/>
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers" Version="2022.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" Version="22.0.14"/>
+  </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Config\appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Config\appsettings.*.json">
-        <DependentUpon>appsettings.json</DependentUpon>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
+  <ItemGroup>
+    <None Update="Config\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Config\appsettings.*.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
