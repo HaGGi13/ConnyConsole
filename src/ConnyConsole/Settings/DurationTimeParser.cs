@@ -5,16 +5,26 @@ namespace ConnyConsole.Settings;
 
 public static partial class DurationTimeParser
 {
-    [GeneratedRegex(@"^(?:(?<d>\d+)\.)?(?<hh>[01]\d|2[0-3]):(?<mm>[0-5]\d):(?<ss>[0-5]\d)(?:\.(?<ms>\d{0,3}))?$" +
-                    @"|^(?:(?<days>\d+(?:\.\d+)?)\s*(d|day|days)\b)?\s*" +
-                    @"(?:(?<hours>\d+(?:\.\d+)?)\s*(h|hour|hours)\b)?\s*" +
-                    @"(?:(?<minutes>\d+(?:\.\d+)?)\s*(m|min|minute|minutes)\b)?\s*"+
-                    @"(?:(?<seconds>\d+(?:\.\d+)?)\s*(s|sec|second|seconds)\b)?\s*" +
-                    @"(?:(?<milliseconds>\d+)\s*(ms|millisecond|milliseconds)\b)?$",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled)]
-    private static partial Regex CombinedTimeMyRegex();
+    private const string StandardDurationTimeFormat =
+        @"^(?:(?<d>\d+)\.)?(?<hh>[01]\d|2[0-3]):(?<mm>[0-5]\d):(?<ss>[0-5]\d)(?:\.(?<ms>\d{0,3}))?$";
 
-    private static readonly Regex TimeRegex = CombinedTimeMyRegex();
+    private const string DaysPattern = @"(?<days>\d+(?:\.\d+)?)\s*(d|day|days)\b";
+    private const string HoursPattern = @"(?<hours>\d+(?:\.\d+)?)\s*(h|hour|hours)\b";
+    private const string MinutesPattern = @"(?<minutes>\d+(?:\.\d+)?)\s*(m|min|minute|minutes)\b";
+    private const string SecondsPattern = @"(?<seconds>\d+(?:\.\d+)?)\s*(s|sec|second|seconds)\b";
+    private const string MillisecondsPattern = @"(?<milliseconds>\d+)\s*(ms|millisecond|milliseconds)\b";
+
+    [GeneratedRegex(StandardDurationTimeFormat + @"|" +
+                    @"^(?:" + DaysPattern + @")?\s*" +
+                    @"(?:" + HoursPattern + @")?\s*" +
+                    @"(?:" + MinutesPattern + @")?\s*" +
+                    @"(?:" + SecondsPattern + @")?\s*" +
+                    @"(?:" + MillisecondsPattern + @")?$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+
+    private static partial Regex CreateTimeFormatRegex();
+
+    private static readonly Regex TimeRegex = CreateTimeFormatRegex();
 
     /// <summary>
     /// Tries to parse a given input string into a <see cref="TimeSpan"/> representation.
@@ -91,7 +101,7 @@ public static partial class DurationTimeParser
     }
 
     /// <summary>
-    /// Parses a possibly matched time in human-readable duration format. For instance like "1h 13m 2s", "5 sec" or "10min 30s".
+    /// Parses a possibly matched time in human-readable duration format. For instance, like "1h 13m 2s", "5 sec" or "10min 30s".
     /// </summary>
     /// <param name="match">Possibly RegEx match that contains values to process.</param>
     /// <param name="result">The parsed result object if successfully parsed; otherwise <see cref="TimeSpan.Zero"/>.</param>
