@@ -47,6 +47,7 @@ public class DurationTimeParserTests
     [InlineData("3 house")]
     [InlineData("3houses")]
     [InlineData("3 houses")]
+    [InlineData("invalid")]
     [InlineData("0h0m3s")]
     [InlineData("0m 3s 1m")]
     [InlineData("3s 1h")]
@@ -56,6 +57,8 @@ public class DurationTimeParserTests
     [InlineData("3,005s")]
     [InlineData("3,005.0s")]
     [InlineData("3,5 s")]
+    [InlineData("1y")]
+    [InlineData("1d 2x")]
     [InlineData("00:00")]
     [InlineData("00:00.0")]
     [InlineData("0.00:00")]
@@ -252,6 +255,51 @@ public class DurationTimeParserTests
 
         // Assert
         parsedValue.Should().Be(new TimeSpan(0, 0, 3));
+        parsedResult.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("00:00:00", 0, 0, 0, 0)]  // Zero time
+    [InlineData("01:00:00", 0, 1, 0, 0)]   // Hours only
+    [InlineData("00:30:00", 0, 0, 30, 0)]  // Minutes only
+    [InlineData("00:00:45", 0, 0, 0, 45)]  // Seconds only
+    [InlineData("1.00:00:00", 1, 0, 0, 0)] // Days only
+    [InlineData("00:00:00.500", 0, 0, 0, 0, 500)] // With milliseconds
+    [InlineData("1.23:45:56.789", 1, 23, 45, 56, 789)] // Complex case
+    public void TryParse_StandardDurationFormat_ShouldParseCorrectly(string input, int days, int hours, int minutes, int seconds, int milliseconds = 0)
+    {
+        // Arrange
+        var expected = new TimeSpan(days, hours, minutes, seconds, milliseconds);
+
+        // Act
+        var parsedResult = DurationTimeParser.TryParse(input, out var parsedValue);
+
+        // Assert
+        parsedValue.Should().Be(expected);
+        parsedResult.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("1d", "1.00:00:00")]
+    [InlineData("2 days", "2.00:00:00")]
+    [InlineData("3h", "03:00:00")]
+    [InlineData("4 hours", "04:00:00")]
+    [InlineData("5m", "00:05:00")]
+    [InlineData("6 minutes", "00:06:00")]
+    [InlineData("7s", "00:00:07")]
+    [InlineData("8 seconds", "00:00:08")]
+    [InlineData("100ms", "00:00:00.100")]
+    [InlineData("1d 2h 3m 4s 500ms", "1.02:03:04.500")]
+    public void TryParse_HumanReadableFormat_ShouldParseCorrectly(string input, string result)
+    {
+        // Arrange
+        _ = TimeSpan.TryParse(result, out var expectedResult);
+
+        // Act
+        var parsedResult = DurationTimeParser.TryParse(input, out var parsedValue);
+
+        // Arrange
+        parsedValue.Should().Be(expectedResult);
         parsedResult.Should().BeTrue();
     }
 
