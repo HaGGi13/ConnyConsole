@@ -1,17 +1,52 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using ConnyConsole.Settings;
+using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Services;
 
-public sealed class JsonConfigurationEditor(IFileSystem fileSystem) : IConfigurationEditor
+public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> logger, IFileSystem fileSystem) : IConfigurationEditor
 {
-    private const string TimeSpanFormat = @"d\.hh\:mm\:ss\.fff";
+    private const string ConfigFileTimeSpanFormat = @"d\.hh\:mm\:ss\.fff";
 
+    /// <summary>
+    /// Sets a configuration value in the JSON configuration file.
+    /// </summary>
+    /// <param name="settingKey">The hierarchical key path for the setting (e.g., "section.subsection.key").</param>
+    /// <param name="newValue">The value to set for the specified setting key.</param>
+    /// <exception cref="ArgumentException">Thrown when settingKey is null or whitespace.</exception>
+    /// <exception cref="NotSupportedException">Thrown when settingKey is not supported.</exception>
     public void SetValue(string settingKey, string newValue)
+    {
+        IsSettingKeyValid(settingKey);
+
+        var configFilePath = AppSettings.GetSystemConfigFilePath(fileSystem);
+        EnsureDirectory(configFilePath);
+
+        var root = LoadFile(configFilePath);
+        var settingSection = NavigateToSettingSection(root, settingKey);
+
+        var finalKeyPart = GetFinalKeyPart(settingKey);
+
+        var parsedValue = ParseSettingValue(newValue);
+        var currentValue = settingSection[finalKeyPart];
+
+        settingSection[finalKeyPart] = parsedValue;
+
+        SaveConfiguration(configFilePath, root);
+
+        logger.LogInformation("Overwrote {SettingKey}={CurrentValue} with {ParsedValue}", settingKey, currentValue, parsedValue);
+    }
+
+    /// <summary>
+    /// Validates the input setting key for null/whitespace and supported format.
+    /// </summary>
+    /// <param name="settingKey">The setting key to validate.</param>
+    /// <exception cref="ArgumentException">Thrown when settingKey is null or whitespace.</exception>
+    /// <exception cref="NotSupportedException">Thrown when settingKey is not supported.</exception>
+    private static void IsSettingKeyValid(string settingKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(settingKey, nameof(settingKey));
 
@@ -19,52 +54,6 @@ public sealed class JsonConfigurationEditor(IFileSystem fileSystem) : IConfigura
         {
             throw new NotSupportedException($"Setting key '{settingKey}' not supported.");
         }
-
-        var configFile = AppSettings.GetSystemConfigFilePath(fileSystem);
-        EnsureDirectory(configFile);
-
-        var root = LoadFile(configFile);
-        var settingSection = root["AppSettings"]!.AsObject();
-
-        var keyParts = settingKey.Split('.', StringSplitOptions.RemoveEmptyEntries);
-
-        // Traverse the path except the last part (which is the final key)
-        for (var i = 0; i < keyParts.Length - 1; i++)
-        {
-            var part = keyParts[i];
-
-            if (!settingSection.ContainsKey(part) || settingSection[part] is not JsonObject)
-            {
-                settingSection[part] = new JsonObject();
-            }
-
-            settingSection = settingSection[part]!.AsObject();
-        }
-
-        var finalKeyPart = keyParts[^1];
-
-        // Try to parse newValue into correct type (int, bool, etc.), else leave as string
-        if (DurationTimeParser.TryParse(newValue, out var timeSpanVal))
-        {
-            settingSection[finalKeyPart] = timeSpanVal.ToString(TimeSpanFormat, CultureInfo.InvariantCulture);
-        }
-        else if (int.TryParse(newValue, out var intVal))
-        {
-            settingSection[finalKeyPart] = intVal;
-        }
-        else if (bool.TryParse(newValue, out var boolVal))
-        {
-            settingSection[finalKeyPart] = boolVal;
-        }
-        else
-        {
-            settingSection[finalKeyPart] = newValue;
-        }
-
-        Debug.WriteLine($"Set newValue: {settingKey}={settingSection[finalKeyPart]}");
-
-        // Save
-        fileSystem.File.WriteAllText(configFile, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }
 
     /// <summary>
@@ -109,12 +98,95 @@ public sealed class JsonConfigurationEditor(IFileSystem fileSystem) : IConfigura
         var json = fileSystem.File.ReadAllText(filePath);
         root = JsonNode.Parse(json)?.AsObject() ?? new JsonObject();
 
-        // Ensure "AppSettings" exists
+        // Ensure the "AppSettings" section exists
         if (!root.ContainsKey("AppSettings") || root["AppSettings"] is not JsonObject)
         {
             root["AppSettings"] = new JsonObject();
         }
 
         return root;
+    }
+
+    /// <summary>
+    /// Navigates through the JSON configuration hierarchy to locate the appropriate section for the setting.
+    /// </summary>
+    /// <param name="root">The root JSON node.</param>
+    /// <param name="settingKey">The hierarchical setting key path.</param>
+    /// <returns>The JSON object representing the section where the setting should be stored.</returns>
+    private static JsonObject NavigateToSettingSection(JsonNode root, string settingKey)
+    {
+        var settingSection = root["AppSettings"]!.AsObject();
+        var keyParts = settingKey.Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+        for (var i = 0; i < keyParts.Length - 1; i++)
+        {
+            var part = keyParts[i];
+            EnsureSettingSectionExists(settingSection, part);
+            settingSection = settingSection[part]!.AsObject();
+        }
+
+        return settingSection;
+    }
+
+    /// <summary>
+    /// Ensures that a specific section exists in the JSON configuration.
+    /// Creates the section if it doesn't exist.
+    /// </summary>
+    /// <param name="section">The parent JSON section.</param>
+    /// <param name="key">The key for the section to ensure.</param>
+    private static void EnsureSettingSectionExists(JsonObject section, string key)
+    {
+        if (!section.ContainsKey(key) || section[key] is not JsonObject)
+        {
+            section[key] = new JsonObject();
+        }
+    }
+
+    /// <summary>
+    /// Extracts the final key part from the hierarchical setting key.
+    /// </summary>
+    /// <param name="settingKey">The full setting key path.</param>
+    /// <returns>The last segment of the setting key path.</returns>
+    private static string GetFinalKeyPart(string settingKey)
+    {
+        return settingKey.Split('.', StringSplitOptions.RemoveEmptyEntries)[^1];
+    }
+
+    /// <summary>
+    /// Parses the input string value into the appropriate JSON type.
+    /// Supports TimeSpan, integer, boolean, and string values.
+    /// </summary>
+    /// <param name="value">The string value to parse.</param>
+    /// <returns>A JsonNode containing the parsed value in the appropriate type.</returns>
+    private static JsonNode ParseSettingValue(string value)
+    {
+        if (DurationTimeParser.TryParse(value, out var timeSpanVal))
+        {
+            return timeSpanVal.ToString(ConfigFileTimeSpanFormat, CultureInfo.InvariantCulture);
+        }
+
+        if (int.TryParse(value, out var intVal))
+        {
+            return intVal;
+        }
+
+        if (bool.TryParse(value, out var boolVal))
+        {
+            return boolVal;
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// Saves the configuration to the specified file with proper formatting.
+    /// </summary>
+    /// <param name="configFile">The path to the configuration file.</param>
+    /// <param name="root">The root JSON node containing the configuration.</param>
+    private void SaveConfiguration(string configFile, JsonNode root)
+    {
+        var options = new JsonSerializerOptions { WriteIndented = true };
+
+        fileSystem.File.WriteAllText(configFile, root.ToJsonString(options));
     }
 }
