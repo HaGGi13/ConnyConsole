@@ -24,10 +24,10 @@ try
         {
             var env = hostContext.HostingEnvironment;
 
+            hostConfig.AddJsonFile(AppSettings.GetSystemConfigFilePath(new FileSystem()), optional: true,
+                reloadOnChange: true);
             hostConfig.AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true);
             hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
-                reloadOnChange: true);
-            hostConfig.AddJsonFile(AppSettings.GetSystemConfigFilePath(new FileSystem()), optional: true,
                 reloadOnChange: true);
         })
         .ConfigureServices((hostContext, services) =>
