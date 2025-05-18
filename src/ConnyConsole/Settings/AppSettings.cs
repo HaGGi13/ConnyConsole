@@ -31,7 +31,7 @@ public class AppSettings
     /// The full path to the system configuration directory as a string.
     /// </returns>
     /// <remarks>
-    /// This method constructs the directory path by combining the common application data folder (obtained via <see cref="Environment.GetFolderPath"/>)
+    /// This method constructs the directory path by combining the common application data folder (obtained via <see cref="Environment.GetFolderPath(System.Environment.SpecialFolder)"/>)
     /// with the application's name (stored in <see cref="App.Name"/>). The resulting path points to a directory where system configuration files
     /// are typically stored.
     /// </remarks>
@@ -44,8 +44,8 @@ public class AppSettings
 
     /// <summary>
     /// Returns the system configuration file's full path.
-    /// It's in an app specific sub-folder located in the <see cref="Environment.SpecialFolder.CommonApplicationData"/> folder.
-    /// <para>On Windows for instance: "C:\ProgramData\ConnyConsole\config.json"</para>
+    /// It's in an app-specific subfolder located in the <see cref="Environment.SpecialFolder.CommonApplicationData"/> folder.
+    /// <para>On Windows, for instance: "C:\ProgramData\ConnyConsole\config.json"</para>
     /// </summary>
     /// <param name="fileSystem">Abstraction instance of the file system.</param>
     /// <returns>The full file path.</returns>
@@ -81,7 +81,7 @@ public class AppSettings
     /// Thrown if <paramref name="key"/> is <c>null</c>, empty, or consists only of white-space characters.
     /// </exception>
     /// <remarks>
-    /// The key is split by dot ('.') characters and each part is used to traverse a hierarchical structure (assumed to be nested dictionaries).
+    /// The key is split by dot ('.') characters, and each part is used to traverse a hierarchical structure (assumed to be nested dictionaries).
     /// A key is considered valid only if each part exists and the final value is a <see cref="bool"/> explicitly set to <c>true</c>.
     /// Keys with a final value of <c>false</c>, <c>null</c>, or a non-boolean type are considered invalid.
     /// </remarks>
