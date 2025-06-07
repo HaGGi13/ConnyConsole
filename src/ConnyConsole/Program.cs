@@ -6,12 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Formatting.Display;
 
 Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(new MessageTemplateTextFormatter(
-        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}"))
+    .AddDefaultConsoleLogger("{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 Log.Logger.ForContext<Program>().Debug("Starting application");
@@ -26,7 +23,7 @@ try
 
             hostConfig.AddJsonFile(AppSettings.GetSystemConfigFilePath(new FileSystem()), optional: true,
                 reloadOnChange: true);
-            hostConfig.AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true);
+            hostConfig.AddJsonFile("Config/appsettings.json", optional: true, reloadOnChange: true);
             hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
                 reloadOnChange: true);
         })

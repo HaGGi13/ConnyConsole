@@ -47,9 +47,41 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddSerilog_RegisteredWithConfig_ResolvesSuccessfully()
+    public void AddSerilog_WithSerilogSectionInConfig_ResolvesLogger()
     {
         // Arrange
+        _services.AddSerilog(_hostBuilderContext.Configuration);
+        var provider = _services.BuildServiceProvider();
+
+        // Act
+        var logger = provider.GetService<ILogger>();
+
+        // Assert
+        logger.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddSerilog_WithEmptySerilogSectionInConfig_ResolvesLogger()
+    {
+        // Arrange
+        _hostBuilderContext.Configuration = TestConfiguration.GetConfiguration(TestConfiguration.ConfigurationWithEmptySerilog);
+
+        _services.AddSerilog(_hostBuilderContext.Configuration);
+        var provider = _services.BuildServiceProvider();
+
+        // Act
+        var logger = provider.GetService<ILogger>();
+
+        // Assert
+        logger.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void AddSerilog_WithNoSerilogSectionInConfig_ResolvesLogger()
+    {
+        // Arrange
+        _hostBuilderContext.Configuration = TestConfiguration.GetConfiguration(TestConfiguration.ConfigurationWithoutSerilog);
+
         _services.AddSerilog(_hostBuilderContext.Configuration);
         var provider = _services.BuildServiceProvider();
 

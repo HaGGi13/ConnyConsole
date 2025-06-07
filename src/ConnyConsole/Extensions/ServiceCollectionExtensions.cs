@@ -16,9 +16,14 @@ public static class ServiceCollectionExtensions
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddSerilog(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSerilog(loggerConfig =>
-            loggerConfig.ReadFrom.Configuration(configuration)
-                .Enrich.FromLogContext());
+        services.AddSerilog(loggerConfig => loggerConfig.AddDefaultConsoleLogger());
+
+        if (configuration.GetSection("Serilog").Exists())
+        {
+            services.AddSerilog(loggerConfig =>
+                loggerConfig.ReadFrom.Configuration(configuration)
+                    .Enrich.FromLogContext());
+        }
 
         return services;
     }
