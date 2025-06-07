@@ -16,8 +16,10 @@ public class AppSettings
         ["Cancellation"] = new Dictionary<string, object> { ["Timeout"] = true }
     };
 
+    // ReSharper disable once PropertyCanBeMadeInitOnly.Global -- used by startup configuration
     public TimeSpan LoopOutputInterval { get; set; } = TimeSpan.FromSeconds(1);
 
+    // ReSharper disable once PropertyCanBeMadeInitOnly.Global -- used by startup configuration
     [JsonPropertyName("Cancellation")]
     public CancellationSettings Cancellation { get; set; } = new();
 
