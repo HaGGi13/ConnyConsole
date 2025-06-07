@@ -78,7 +78,7 @@ public static partial class DurationTimeParser
     /// Tries to parse a possibly matched time in duration format [d.]HH:mm:ss[.fff].
     /// </summary>
     /// <param name="match">Possibly RegEx match that contains values to process.</param>
-    /// <param name="result">The parsed result object if successfully parsed; otherwise <see cref="TimeSpan.Zero"/>.</param>
+    /// <param name="result">The parsed result object, if successfully parsed; otherwise <see cref="TimeSpan.Zero"/>.</param>
     /// <returns><c>true</c> if successfully parsed; otherwise <c>false</c></returns>
     private static bool TryParseDurationFormat(Match match, out TimeSpan result)
     {
@@ -104,7 +104,7 @@ public static partial class DurationTimeParser
     /// Parses a possibly matched time in human-readable duration format. For instance, like "1h 13m 2s", "5 sec" or "10min 30s".
     /// </summary>
     /// <param name="match">Possibly RegEx match that contains values to process.</param>
-    /// <param name="result">The parsed result object if successfully parsed; otherwise <see cref="TimeSpan.Zero"/>.</param>
+    /// <param name="result">The parsed result object, if successfully parsed; otherwise <see cref="TimeSpan.Zero"/>.</param>
     /// <returns>The parsed result object.</returns>
     private static bool TryParseHumanReadableDurationFormat(Match match, out TimeSpan result)
     {

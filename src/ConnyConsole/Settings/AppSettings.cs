@@ -87,7 +87,7 @@ public class AppSettings
     /// </remarks>
     private static bool IsValidConfigKey(string key)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(key, nameof(key));
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
         var keyParts = key.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         object currentKeyValue = SupportedSettingKeys;

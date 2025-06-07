@@ -48,7 +48,7 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
     /// <exception cref="NotSupportedException">Thrown when settingKey is not supported.</exception>
     private static void IsSettingKeyValid(string settingKey)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(settingKey, nameof(settingKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(settingKey);
 
         if (!AppSettings.IsValidSettingKey(settingKey))
         {
@@ -86,7 +86,7 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
     /// </returns>
     private JsonObject LoadFile(string filePath)
     {
-        var root = new JsonObject { ["AppSettings"] = new JsonObject() };
+        var root = new JsonObject { [AppSettings.SectionName] = new JsonObject() };
 
         var fileInfo = fileSystem.FileInfo.New(filePath);
 
@@ -99,9 +99,9 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
         root = JsonNode.Parse(json)?.AsObject() ?? new JsonObject();
 
         // Ensure the "AppSettings" section exists
-        if (!root.ContainsKey("AppSettings") || root["AppSettings"] is not JsonObject)
+        if (!root.ContainsKey(AppSettings.SectionName) || root[AppSettings.SectionName] is not JsonObject)
         {
-            root["AppSettings"] = new JsonObject();
+            root[AppSettings.SectionName] = new JsonObject();
         }
 
         return root;
@@ -111,7 +111,7 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
     /// Navigates through the JSON configuration hierarchy to locate the appropriate section for the setting.
     /// </summary>
     /// <param name="root">The root JSON node.</param>
-    /// <param name="settingKey">The hierarchical setting key path.</param>
+    /// <param name="settingKey">The hierarchical settings key path.</param>
     /// <returns>The JSON object representing the section where the setting should be stored.</returns>
     private static JsonObject NavigateToSettingSection(JsonNode root, string settingKey)
     {
