@@ -2,27 +2,36 @@
 using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
-using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Services;
 
-public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> logger, IFileSystem fileSystem) : IConfigurationEditor
+public sealed class JsonConfigurationEditor(IFileSystem fileSystem)
+    : IConfigurationEditor
 {
     private const string ConfigFileTimeSpanFormat = @"d\.hh\:mm\:ss\.fff";
+
+    private static readonly Dictionary<ConfigurationScope, Func<IFileSystem, string>> ConfigurationHandlers = new()
+    {
+        [ConfigurationScope.System] = SystemConfiguration.GetConfigFilePath,
+        [ConfigurationScope.Global] = GlobalConfiguration.GetConfigFilePath,
+        [ConfigurationScope.Local] = LocalConfiguration.GetConfigFilePath
+    };
 
     /// <summary>
     /// Sets a configuration value in the JSON configuration file.
     /// </summary>
     /// <param name="settingKey">The hierarchical key path for the setting (e.g., "section.subsection.key").</param>
     /// <param name="newValue">The value to set for the specified setting key.</param>
+    /// <param name="scope">The configuration scope to set the value.</param>
     /// <exception cref="ArgumentException">Thrown when settingKey is null or whitespace.</exception>
     /// <exception cref="NotSupportedException">Thrown when settingKey is not supported.</exception>
-    public void SetValue(string settingKey, string newValue)
+    public string SetValue(string? settingKey, string? newValue, ConfigurationScope scope)
     {
         IsSettingKeyValid(settingKey);
 
-        var configFilePath = AppSettings.GetSystemConfigFilePath(fileSystem);
+        var configFilePath = GetConfigFilePath(scope);
         EnsureDirectory(configFilePath);
 
         var root = LoadFile(configFilePath);
@@ -37,7 +46,25 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
 
         SaveConfiguration(configFilePath, root);
 
-        logger.LogInformation("Overwrote {SettingKey}={CurrentValue} with {ParsedValue}", settingKey, currentValue, parsedValue);
+        return currentValue is not null
+            ? $"Overwrote {settingKey}={currentValue} with {parsedValue}"
+            : $"Added {settingKey}={parsedValue}";
+    }
+
+    /// <summary>
+    /// Retrieves the configuration file path based on the specified configuration scope.
+    /// </summary>
+    /// <param name="scope">The configuration scope indicating which configuration file path to retrieve (e.g., Global, System, or Local).</param>
+    /// <returns>The full path of the configuration file as a string.</returns>
+    /// <exception cref="ArgumentException">Thrown when the provided scope is invalid or unsupported.</exception>
+    private string GetConfigFilePath(ConfigurationScope scope)
+    {
+        if (!ConfigurationHandlers.TryGetValue(scope, out var configurationPathHandler))
+        {
+            throw new ArgumentException($"Unsupported configuration scope: {scope}", nameof(scope));
+        }
+
+        return configurationPathHandler(fileSystem);
     }
 
     /// <summary>
@@ -46,7 +73,7 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
     /// <param name="settingKey">The setting key to validate.</param>
     /// <exception cref="ArgumentException">Thrown when settingKey is null or whitespace.</exception>
     /// <exception cref="NotSupportedException">Thrown when settingKey is not supported.</exception>
-    private static void IsSettingKeyValid(string settingKey)
+    private static void IsSettingKeyValid(string? settingKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(settingKey);
 
@@ -113,10 +140,10 @@ public sealed class JsonConfigurationEditor(ILogger<JsonConfigurationEditor> log
     /// <param name="root">The root JSON node.</param>
     /// <param name="settingKey">The hierarchical settings key path.</param>
     /// <returns>The JSON object representing the section where the setting should be stored.</returns>
-    private static JsonObject NavigateToSettingSection(JsonNode root, string settingKey)
+    private static JsonObject NavigateToSettingSection(JsonNode root, string? settingKey)
     {
         var settingSection = root["AppSettings"]!.AsObject();
-        var keyParts = settingKey.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        var keyParts = settingKey?.Split('.', StringSplitOptions.RemoveEmptyEntries) ?? [];
 
         for (var i = 0; i < keyParts.Length - 1; i++)
         {

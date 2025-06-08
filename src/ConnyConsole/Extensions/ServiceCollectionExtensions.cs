@@ -58,6 +58,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<SettingValueArgument>();
 
         // Options
+        services.AddTransient<LocalOption>();
+        services.AddTransient<GlobalOption>();
+        services.AddTransient<SystemOption>();
         services.AddTransient<CategoryOption>();
 
         // Commands

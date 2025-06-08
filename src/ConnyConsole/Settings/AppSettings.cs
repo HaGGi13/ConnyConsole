@@ -1,13 +1,9 @@
-using System.IO.Abstractions;
 using System.Text.Json.Serialization;
 
 namespace ConnyConsole.Settings;
 
 public class AppSettings
 {
-    private const string SystemConfigFileName = "config.json";
-    private static string? _systemConfigFilePath;
-
     public const string SectionName = "AppSettings";
 
     private static readonly Dictionary<string, object> SupportedSettingKeys = new()
@@ -23,53 +19,13 @@ public class AppSettings
     [JsonPropertyName("Cancellation")]
     public CancellationSettings Cancellation { get; set; } = new();
 
-    /// <summary>
-    /// Retrieves the path to the system configuration directory, combining the common application data path with the application name.
-    /// </summary>
-    /// <param name="fileSystem">
-    /// The file system object used to combine paths. This allows for testability and abstraction of file system operations.
-    /// </param>
-    /// <returns>
-    /// The full path to the system configuration directory as a string.
-    /// </returns>
-    /// <remarks>
-    /// This method constructs the directory path by combining the common application data folder (obtained via <see cref="Environment.GetFolderPath(System.Environment.SpecialFolder)"/>)
-    /// with the application's name (stored in <see cref="App.Name"/>). The resulting path points to a directory where system configuration files
-    /// are typically stored.
-    /// </remarks>
-    private static string GetSystemConfigDirectoryPath(IFileSystem fileSystem)
-    {
-        var commonApplicationDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-
-        return fileSystem.Path.Combine(commonApplicationDataPath, App.Name);
-    }
-
-    /// <summary>
-    /// Returns the system configuration file's full path.
-    /// It's in an app-specific subfolder located in the <see cref="Environment.SpecialFolder.CommonApplicationData"/> folder.
-    /// <para>On Windows, for instance: "C:\ProgramData\ConnyConsole\config.json"</para>
-    /// </summary>
-    /// <param name="fileSystem">Abstraction instance of the file system.</param>
-    /// <returns>The full file path.</returns>
-    internal static string GetSystemConfigFilePath(IFileSystem fileSystem)
-    {
-        if (!string.IsNullOrWhiteSpace(_systemConfigFilePath))
-        {
-            return _systemConfigFilePath;
-        }
-
-        var systemConfigDirectory = GetSystemConfigDirectoryPath(fileSystem);
-        _systemConfigFilePath = fileSystem.Path.Combine(systemConfigDirectory, SystemConfigFileName);
-
-        return _systemConfigFilePath;
-    }
 
     /// <summary>
     /// Determines whether the specified setting <paramref name="key"/> is valid and supported.
     /// </summary>
     /// <param name="key">The setting key to validate.</param>
     /// <returns><c>true</c> if the setting key is valid and supported; otherwise <c>false</c></returns>
-    internal static bool IsValidSettingKey(string key)
+    internal static bool IsValidSettingKey(string? key)
     {
         return IsValidConfigKey(key);
     }
@@ -87,11 +43,12 @@ public class AppSettings
     /// A key is considered valid only if each part exists and the final value is a <see cref="bool"/> explicitly set to <c>true</c>.
     /// Keys with a final value of <c>false</c>, <c>null</c>, or a non-boolean type are considered invalid.
     /// </remarks>
-    private static bool IsValidConfigKey(string key)
+    private static bool IsValidConfigKey(string? key)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
-        var keyParts = key.Split('.', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        // Don't remove empty entries, this is handled by later code that checks against supported keys!
+        var keyParts = key.Split('.', StringSplitOptions.TrimEntries);
         object currentKeyValue = SupportedSettingKeys;
 
         for (var i = 0; i < keyParts.Length; i++)

@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using ConnyConsole;
 using ConnyConsole.Extensions;
-using ConnyConsole.Settings;
+using ConnyConsole.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,11 +21,13 @@ try
         {
             var env = hostContext.HostingEnvironment;
 
-            hostConfig.AddJsonFile(AppSettings.GetSystemConfigFilePath(new FileSystem()), optional: true,
-                reloadOnChange: true);
+            var fileSystem = new FileSystem();
+            hostConfig.AddJsonFile(SystemConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile(GlobalConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile(LocalConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
+
             hostConfig.AddJsonFile("Config/appsettings.json", optional: true, reloadOnChange: true);
-            hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
-                reloadOnChange: true);
+            hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
         })
         .ConfigureServices((hostContext, services) =>
         {

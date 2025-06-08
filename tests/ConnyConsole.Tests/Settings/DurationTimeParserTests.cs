@@ -3,8 +3,10 @@ using FluentAssertions;
 
 namespace ConnyConsole.Tests.Settings;
 
-public class DurationTimeParserTests
+public sealed class DurationTimeParserTests
 {
+    #region Invalid input tests
+
     [Fact]
     public void TryParse_NullInput_ReturnsFalseAndTimeSpanZero()
     {
@@ -81,6 +83,10 @@ public class DurationTimeParserTests
     [InlineData("0.00:61:00")]
     [InlineData("0.24:00:00")]
     [InlineData("0.25:00:00")]
+    [InlineData("1E+999999999 days")] // The value is too large for double.Parse and will throw OverflowException
+    [InlineData("1.2.3 days")] // The double.Parse will throw FormatException due to multiple decimal points
+    [InlineData("999999999 days 23 hours 59 minutes 59 seconds")] // This will cause TimeSpan overflow when components are added together
+    [InlineData("1 day 2.5ms")] // int.Parse will throw FormatException due to an invalid integer format
     public void TryParse_InvalidInput_ReturnsFalseAndTimeSpanZero(string? input)
     {
         // Arrange
@@ -91,6 +97,8 @@ public class DurationTimeParserTests
         parsedValue.Should().Be(TimeSpan.Zero);
         parsedResult.Should().BeFalse();
     }
+
+    #endregion
 
     [Theory]
     [InlineData("00:00:00.0")]
@@ -303,7 +311,7 @@ public class DurationTimeParserTests
         parsedResult.Should().BeTrue();
     }
 
-    # region Value rolling over tests that result in next bigger unit
+    #region Value rolling over tests that result in next bigger unit
 
     [Theory]
     [InlineData("1000ms")]
