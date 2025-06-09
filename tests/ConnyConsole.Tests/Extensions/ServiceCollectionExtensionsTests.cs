@@ -1,11 +1,13 @@
+using System.IO.Abstractions;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
 using ConnyConsole.Cli;
+using ConnyConsole.Cli.Config;
 using ConnyConsole.Cli.Log;
 using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
+using ConnyConsole.Services;
 using ConnyConsole.Settings;
-using ConnyConsole.Tests.TestExtensions;
 using ConnyConsole.Tests.TestHelpers;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,7 +99,7 @@ public class ServiceCollectionExtensionsTests
     #region AddSettings
 
     [Fact]
-    public void AddSettings_ShouldRegisterDependencies_Successfully()
+    public void AddSettings_ShouldRegisterAppSettings_Successfully()
     {
         // Arrange
         _hostBuilderContext.Configuration["AppSettings:LoopOutputInterval"] = "00:00:13";
@@ -116,12 +118,37 @@ public class ServiceCollectionExtensionsTests
         options.Value.Cancellation.Timeout.Should().Be(TimeSpan.FromSeconds(5));
     }
 
+    [Fact]
+    public void AddSettings_ShouldRegisterCancellationSettings_Successfully()
+    {
+        // Arrange
+        _hostBuilderContext.Configuration["AppSettings:LoopOutputInterval"] = "00:00:13";
+        _hostBuilderContext.Configuration["AppSettings:Cancellation:Timeout"] = "00:00:05";
+
+        // Act
+        _services.AddSettings(_hostBuilderContext.Configuration);
+        var serviceProvider = _services.BuildServiceProvider();
+
+        var cancellationSettings = serviceProvider.GetService<IOptions<CancellationSettings>>();
+
+        // Assert
+        cancellationSettings.Should().NotBeNull();
+        cancellationSettings.Value.Should().NotBeNull();
+        cancellationSettings.Value.Timeout.Should().Be(TimeSpan.FromSeconds(5));
+    }
+
     #endregion
 
     #region AddServices
 
-    [Fact]
-    public void AddServices_ConsoleCancellationTokenSourceDependencyRegistration_Successfully()
+    [Theory]
+    [InlineData(typeof(IFileSystem), typeof(FileSystem))]
+    [InlineData(typeof(IApp), typeof(App))]
+    [InlineData(typeof(ConsoleCancellationTokenSource), typeof(ConsoleCancellationTokenSource))]
+    [InlineData(typeof(ILogService), typeof(LogService))]
+    [InlineData(typeof(IConfigurationEditor), typeof(JsonConfigurationEditor))]
+    [InlineData(typeof(IEnvironmentProvider), typeof(SystemEnvironmentProvider))]
+    public void AddServices_DependencyRegistration_SuccessfulResolvable(Type toResolve, Type targetType)
     {
         // Arrange
         // Class App has CLI parser dependencies that must be set up before
@@ -131,14 +158,18 @@ public class ServiceCollectionExtensionsTests
         _services.AddServices();
         var serviceProvider = _services.BuildServiceProvider();
 
-        var consoleCancellationTokenSource = serviceProvider.GetService<ConsoleCancellationTokenSource>();
+        var resolvedDependency = serviceProvider.GetService(toResolve);
 
         // Assert
-        consoleCancellationTokenSource.Should().NotBeNull();
+        resolvedDependency.Should().NotBeNull();
+        resolvedDependency.Should().BeOfType(targetType);
     }
 
-    [Fact]
-    public void AddServices_AppDependencyRegistration_Successfully()
+    [Theory]
+    [InlineData(typeof(IConfigurationPathProvider),"System", typeof(SystemConfiguration))]
+    [InlineData(typeof(IConfigurationPathProvider), "Global", typeof(GlobalConfiguration))]
+    [InlineData(typeof(IConfigurationPathProvider), "Local", typeof(LocalConfiguration))]
+    public void AddServices_KeyedDependencyRegistration_SuccessfulResolvable(Type toResolve, string serviceKey, Type targetType)
     {
         // Arrange
         // Class App has CLI parser dependencies that must be set up before
@@ -148,14 +179,20 @@ public class ServiceCollectionExtensionsTests
         _services.AddServices();
         var serviceProvider = _services.BuildServiceProvider();
 
-        var app = serviceProvider.GetService<IApp>();
+        var resolvedDependency = serviceProvider.GetKeyedService(toResolve, serviceKey);
 
         // Assert
-        app.Should().NotBeNull();
+        resolvedDependency.Should().NotBeNull();
+        resolvedDependency.Should().BeOfType(targetType);
     }
 
-    [Fact]
-    public void AddServices_AppRegistrationLifetime_Transient()
+    [Theory]
+    [InlineData(typeof(IFileSystem), typeof(FileSystem), ServiceLifetime.Scoped)]
+    [InlineData(typeof(IApp), typeof(App), ServiceLifetime.Scoped)]
+    [InlineData(typeof(ConsoleCancellationTokenSource), typeof(ConsoleCancellationTokenSource), ServiceLifetime.Scoped)]
+    [InlineData(typeof(ILogService), typeof(LogService), ServiceLifetime.Scoped)]
+    [InlineData(typeof(IConfigurationEditor), typeof(JsonConfigurationEditor), ServiceLifetime.Scoped)]
+    public void AddServices_RegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
@@ -163,35 +200,72 @@ public class ServiceCollectionExtensionsTests
         // Act
         _services.AddServices();
 
-        var appDescriptor = _services.FirstOrDefault(s => s.ServiceType == typeof(IApp));
+        var descriptor =
+            _services.SingleOrDefault(s => s.ServiceType == serviceType && s.ImplementationType == implementationType);
 
         // Assert
-        appDescriptor.Should().NotBeNull();
-        appDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+        descriptor.Should().NotBeNull();
+        descriptor.Lifetime.Should().Be(lifetime);
     }
 
-    [Fact]
-    public void AddServices_ConsoleCancellationTokenSourceRegistrationLifetime_Transient()
+    [Theory]
+    [InlineData(typeof(IEnvironmentProvider), ServiceLifetime.Scoped)]
+    public void AddServices_FactoryRegistrationLifetime_Scoped(Type serviceType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
 
         // Act
         _services.AddServices();
-        var consoleCancellationTokenSourceDescriptor =
-            _services.FirstOrDefault(s => s.ServiceType == typeof(ConsoleCancellationTokenSource));
+
+        var descriptor =
+            _services.SingleOrDefault(s => s.ServiceType == serviceType && s.ImplementationFactory != null);
 
         // Assert
-        consoleCancellationTokenSourceDescriptor.Should().NotBeNull();
-        consoleCancellationTokenSourceDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+        descriptor.Should().NotBeNull();
+        descriptor.Lifetime.Should().Be(lifetime);
+    }
+
+    [Theory]
+    [InlineData(typeof(IConfigurationPathProvider), typeof(SystemConfiguration), ServiceLifetime.Scoped)]
+    [InlineData(typeof(IConfigurationPathProvider), typeof(GlobalConfiguration), ServiceLifetime.Scoped)]
+    [InlineData(typeof(IConfigurationPathProvider), typeof(LocalConfiguration), ServiceLifetime.Scoped)]
+    public void AddServices_KeyedRegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    {
+        // Arrange
+        // nothing to do - already happen in ctor
+
+        // Act
+        _services.AddServices();
+
+        var descriptor =
+            _services.SingleOrDefault(s => s.ServiceType == serviceType && s.KeyedImplementationType == implementationType);
+
+        // Assert
+        descriptor.Should().NotBeNull();
+        descriptor.Lifetime.Should().Be(lifetime);
     }
 
     #endregion
 
     #region AddCliParser
 
-    [Fact]
-    public void AddCliParser_RegistersCliRootCommand_Successfully()
+    [Theory]
+    // Arguments
+    [InlineData(typeof(MessageArgument), typeof(MessageArgument))]
+    [InlineData(typeof(SettingKeyArgument), typeof(SettingKeyArgument))]
+    [InlineData(typeof(SettingValueArgument), typeof(SettingValueArgument))]
+    // Options
+    [InlineData(typeof(LocalOption), typeof(LocalOption))]
+    [InlineData(typeof(GlobalOption), typeof(GlobalOption))]
+    [InlineData(typeof(SystemOption), typeof(SystemOption))]
+    [InlineData(typeof(CategoryOption), typeof(CategoryOption))]
+    // Commands
+    [InlineData(typeof(LogCommand), typeof(LogCommand))]
+    [InlineData(typeof(SetConfigCommand), typeof(SetConfigCommand))]
+    [InlineData(typeof(ConfigCommand), typeof(ConfigCommand))]
+    [InlineData(typeof(CliRootCommand), typeof(CliRootCommand))]
+    public void AddCliParser_DependencyRegistration_SuccessfulResolvable(Type toResolve, Type targetType)
     {
         // Arrange
         _services.AddServices();
@@ -200,114 +274,41 @@ public class ServiceCollectionExtensionsTests
         _services.AddCliParser();
         var serviceProvider = _services.BuildServiceProvider();
 
-        var cliRootCommand = serviceProvider.GetService<CliRootCommand>();
+        var resolvedDependency = serviceProvider.GetService(toResolve);
 
         // Assert
-        cliRootCommand.Should().NotBeNull();
+        resolvedDependency.Should().NotBeNull();
+        resolvedDependency.Should().BeOfType(targetType);
     }
 
-    [Fact]
-    public void AddCliParser_CliRootCommandRegistrationLifetime_Transient()
+    [Theory]
+    // Arguments
+    [InlineData(typeof(MessageArgument), typeof(MessageArgument), ServiceLifetime.Scoped)]
+    [InlineData(typeof(SettingKeyArgument), typeof(SettingKeyArgument), ServiceLifetime.Scoped)]
+    [InlineData(typeof(SettingValueArgument), typeof(SettingValueArgument), ServiceLifetime.Scoped)]
+    // Options
+    [InlineData(typeof(LocalOption), typeof(LocalOption), ServiceLifetime.Scoped)]
+    [InlineData(typeof(GlobalOption), typeof(GlobalOption), ServiceLifetime.Scoped)]
+    [InlineData(typeof(SystemOption), typeof(SystemOption), ServiceLifetime.Scoped)]
+    [InlineData(typeof(CategoryOption), typeof(CategoryOption), ServiceLifetime.Scoped)]
+    // Commands
+    [InlineData(typeof(LogCommand), typeof(LogCommand), ServiceLifetime.Scoped)]
+    [InlineData(typeof(SetConfigCommand), typeof(SetConfigCommand), ServiceLifetime.Scoped)]
+    [InlineData(typeof(ConfigCommand), typeof(ConfigCommand), ServiceLifetime.Scoped)]
+    [InlineData(typeof(CliRootCommand), typeof(CliRootCommand), ServiceLifetime.Scoped)]
+    public void AddCliParser_RegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
 
         // Act
         _services.AddCliParser();
-        var cliRootCommandDescriptor = _services.GetServiceDescriptor<CliRootCommand>();
+        var descriptor =
+            _services.SingleOrDefault(s => s.ServiceType == serviceType && s.ImplementationType == implementationType);
 
         // Assert
-        cliRootCommandDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
-    }
-
-    [Fact]
-    public void AddCliParser_RegistersMessageArgument_Successfully()
-    {
-        // Arrange
-        // nothing to do - already happen in ctor
-
-        // Act
-        _services.AddCliParser();
-        var serviceProvider = _services.BuildServiceProvider();
-
-        var messageArgument = serviceProvider.GetService<MessageArgument>();
-
-        // Assert
-        messageArgument.Should().NotBeNull();
-    }
-
-    [Fact]
-    public void AddCliParser_MessageArgumentRegistrationLifetime_Transient()
-    {
-        // Arrange
-        // nothing to do - already happen in ctor
-
-        // Act
-        _services.AddCliParser();
-        var messageArgumentDescriptor = _services.GetServiceDescriptor<MessageArgument>();
-
-        // Assert
-        messageArgumentDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
-    }
-
-    [Fact]
-    public void AddCliParser_RegistersCategoryOption_Successfully()
-    {
-        // Arrange
-        // nothing to do - already happen in ctor
-
-        // Act
-        _services.AddCliParser();
-        var serviceProvider = _services.BuildServiceProvider();
-
-        var categoryOption = serviceProvider.GetService<CategoryOption>();
-
-        // Assert
-        categoryOption.Should().NotBeNull();
-    }
-
-    [Fact]
-    public void AddCliParser_CategoryOptionRegistrationLifetime_Transient()
-    {
-        // Arrange
-        // nothing to do - already happen in ctor
-
-        // Act
-        _services.AddCliParser();
-        var categoryOptionDescriptor = _services.GetServiceDescriptor<CategoryOption>();
-
-        // Assert
-        categoryOptionDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
-    }
-
-    [Fact]
-    public void AddCliParser_RegistersLogCommand_Successfully()
-    {
-        // Arrange
-        _services.AddServices();
-
-        // Act
-        _services.AddCliParser();
-        var serviceProvider = _services.BuildServiceProvider();
-
-        var logCommand = serviceProvider.GetService<LogCommand>();
-
-        // Assert
-        logCommand.Should().NotBeNull();
-    }
-
-    [Fact]
-    public void AddCliParser_LogCommandRegistrationLifetime_Transient()
-    {
-        // Arrange
-        // nothing to do - already happen in ctor
-
-        // Act
-        _services.AddCliParser();
-        var logCommandDescriptor = _services.GetServiceDescriptor<LogCommand>();
-
-        // Assert
-        logCommandDescriptor.Lifetime.Should().Be(ServiceLifetime.Transient);
+        descriptor.Should().NotBeNull();
+        descriptor.Lifetime.Should().Be(lifetime);
     }
 
     #endregion

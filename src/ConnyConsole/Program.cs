@@ -20,11 +20,16 @@ try
         .ConfigureAppConfiguration((hostContext, hostConfig) =>
         {
             var env = hostContext.HostingEnvironment;
-
             var fileSystem = new FileSystem();
-            hostConfig.AddJsonFile(SystemConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
-            hostConfig.AddJsonFile(GlobalConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
-            hostConfig.AddJsonFile(LocalConfiguration.GetConfigFilePath(fileSystem), optional: true, reloadOnChange: true);
+
+            var systemConfiguration = new SystemConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
+            hostConfig.AddJsonFile(systemConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+
+            var globalConfiguration = new GlobalConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
+            hostConfig.AddJsonFile(globalConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+
+            var localConfiguration = new LocalConfiguration(fileSystem);
+            hostConfig.AddJsonFile(localConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
 
             hostConfig.AddJsonFile("Config/appsettings.json", optional: true, reloadOnChange: true);
             hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);

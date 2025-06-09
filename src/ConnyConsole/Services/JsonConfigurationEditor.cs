@@ -4,19 +4,24 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ConnyConsole.Services;
 
-public sealed class JsonConfigurationEditor(IFileSystem fileSystem)
+public sealed class JsonConfigurationEditor(
+    [FromKeyedServices("System")] IConfigurationPathProvider systemConfiguration,
+    [FromKeyedServices("Global")] IConfigurationPathProvider globalConfiguration,
+    [FromKeyedServices("Local")] IConfigurationPathProvider localConfiguration,
+    IFileSystem fileSystem)
     : IConfigurationEditor
 {
     private const string ConfigFileTimeSpanFormat = @"d\.hh\:mm\:ss\.fff";
 
-    private static readonly Dictionary<ConfigurationScope, Func<IFileSystem, string>> ConfigurationHandlers = new()
+    private readonly Dictionary<ConfigurationScope, Func<IFileSystem, string>> _configurationHandlers = new()
     {
-        [ConfigurationScope.System] = SystemConfiguration.GetConfigFilePath,
-        [ConfigurationScope.Global] = GlobalConfiguration.GetConfigFilePath,
-        [ConfigurationScope.Local] = LocalConfiguration.GetConfigFilePath
+        [ConfigurationScope.System] = _ => systemConfiguration.GetConfigFilePath(),
+        [ConfigurationScope.Global] = _ => globalConfiguration.GetConfigFilePath(),
+        [ConfigurationScope.Local] = _ => localConfiguration.GetConfigFilePath()
     };
 
     /// <summary>
@@ -59,7 +64,7 @@ public sealed class JsonConfigurationEditor(IFileSystem fileSystem)
     /// <exception cref="ArgumentException">Thrown when the provided scope is invalid or unsupported.</exception>
     private string GetConfigFilePath(ConfigurationScope scope)
     {
-        if (!ConfigurationHandlers.TryGetValue(scope, out var configurationPathHandler))
+        if (!_configurationHandlers.TryGetValue(scope, out var configurationPathHandler))
         {
             throw new ArgumentException($"Unsupported configuration scope: {scope}", nameof(scope));
         }
@@ -174,9 +179,9 @@ public sealed class JsonConfigurationEditor(IFileSystem fileSystem)
     /// </summary>
     /// <param name="settingKey">The full setting key path.</param>
     /// <returns>The last segment of the setting key path.</returns>
-    private static string GetFinalKeyPart(string settingKey)
+    private static string GetFinalKeyPart(string? settingKey)
     {
-        return settingKey.Split('.', StringSplitOptions.RemoveEmptyEntries)[^1];
+        return settingKey?.Split('.', StringSplitOptions.RemoveEmptyEntries)[^1] ?? string.Empty;
     }
 
     /// <summary>
@@ -185,7 +190,7 @@ public sealed class JsonConfigurationEditor(IFileSystem fileSystem)
     /// </summary>
     /// <param name="value">The string value to parse.</param>
     /// <returns>A JsonNode containing the parsed value in the appropriate type.</returns>
-    private static JsonNode ParseSettingValue(string value)
+    private static JsonNode? ParseSettingValue(string? value)
     {
         if (DurationTimeParser.TryParse(value, out var timeSpanVal))
         {

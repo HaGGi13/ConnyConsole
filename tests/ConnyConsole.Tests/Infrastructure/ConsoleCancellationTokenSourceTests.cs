@@ -43,7 +43,7 @@ public class ConsoleCancellationTokenSourceTests
         var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
-        // Timout set to 3 to test case w/o timeout situation
+        // Timout set to 3, to test case w/o timeout situation
         var handler = tokenSource.CreateCancellationHandler(TimeSpan.FromSeconds(3));
         // First Ctrl + C
         handler.Invoke(null, consoleCancelEventArgs);
@@ -131,6 +131,8 @@ public class ConsoleCancellationTokenSourceTests
 
     #endregion
 
+    #region Helper methids
+
     private static ConsoleCancelEventArgs CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
     {
         var consoleCancelEventArgsType = typeof(ConsoleCancelEventArgs);
@@ -138,4 +140,6 @@ public class ConsoleCancellationTokenSourceTests
 
         return (ConsoleCancelEventArgs)constructor.Invoke([key]);
     }
+
+    #endregion
 }

@@ -5,28 +5,40 @@ namespace ConnyConsole.Infrastructure;
 /// <summary>
 /// Provides functionality for handling local-level (current working directory) configuration files.
 /// </summary>
-public static class LocalConfiguration
+public sealed class LocalConfiguration : IConfigurationPathProvider
 {
     private const string ConfigDirectoryName = $".{App.Name}";
     private const string LocalConfigFileName = "config";
-    private static string? _localConfigFilePath;
+
+    private readonly IFileSystem _fileSystem;
+
+    private string? _localConfigFilePath;
 
     /// <summary>
-    /// Returns the local (working directory) configuration file's full path.
+    /// Provides functionality for managing the local (working directory) configuration file path within the application.
+    /// This allows testable and abstracted access to file system and environment operations.
     /// </summary>
     /// <param name="fileSystem">
     /// Abstraction instance of the file system. This allows for testability and abstraction of file system operations.
     /// </param>
+    public LocalConfiguration(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+
+    /// <summary>
+    /// Returns the local (working directory) configuration file's full path.
+    /// </summary>
     /// <returns>The full file path.</returns>
-    internal static string GetConfigFilePath(IFileSystem fileSystem)
+    public string GetConfigFilePath()
     {
         if (!string.IsNullOrWhiteSpace(_localConfigFilePath))
         {
             return _localConfigFilePath;
         }
 
-        var systemConfigDirectory = GetLocalConfigDirectoryPath(fileSystem);
-        _localConfigFilePath = fileSystem.Path.Combine(systemConfigDirectory, LocalConfigFileName);
+        var systemConfigDirectory = GetLocalConfigDirectoryPath();
+        _localConfigFilePath = _fileSystem.Path.Combine(systemConfigDirectory, LocalConfigFileName);
 
         return _localConfigFilePath;
     }
@@ -34,16 +46,13 @@ public static class LocalConfiguration
     /// <summary>
     /// Retrieves the path to the current working directory config folder, combining the current folder path with the application name.
     /// </summary>
-    /// <param name="fileSystem">
-    /// Abstraction instance of the file system. This allows for testability and abstraction of file system operations.
-    /// </param>
     /// <returns>
     /// The full path to the system configuration directory as a string.
     /// </returns>
-    private static string GetLocalConfigDirectoryPath(IFileSystem fileSystem)
+    private string GetLocalConfigDirectoryPath()
     {
-        var currentDirectoryPath = fileSystem.Directory.GetCurrentDirectory();
+        var currentDirectoryPath = _fileSystem.Directory.GetCurrentDirectory();
 
-        return fileSystem.Path.Combine(currentDirectoryPath, ConfigDirectoryName.ToLowerInvariant());
+        return _fileSystem.Path.Combine(currentDirectoryPath, ConfigDirectoryName.ToLowerInvariant());
     }
 }

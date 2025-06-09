@@ -3,22 +3,40 @@ using ConnyConsole.Infrastructure;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
 using FluentAssertions;
+using NSubstitute;
 
 namespace ConnyConsole.Tests.Services;
 
 public class JsonConfigurationEditorTests
 {
+    private const string SystemConfigPath = @"C:\ProgramData\ConnyConsole\config";
+    private const string GlobalConfigPath = @"C:\Users\TestUser\.connyconfig";
+    private const string LocalConfigPath = @"C:\Temp\.connyconsole\config";
+
+    private readonly IConfigurationPathProvider _globalConfiguration;
+    private readonly IConfigurationPathProvider _systemConfiguration;
+    private readonly IConfigurationPathProvider _localConfiguration;
+
     private readonly MockFileSystem _fileSystem;
     private readonly JsonConfigurationEditor _configEditor;
 
     public JsonConfigurationEditorTests()
     {
+        _systemConfiguration = Substitute.For<IConfigurationPathProvider>();
+        _systemConfiguration.GetConfigFilePath().Returns(SystemConfigPath);
+
+        _globalConfiguration = Substitute.For<IConfigurationPathProvider>();
+        _globalConfiguration.GetConfigFilePath().Returns(GlobalConfigPath);
+
+        _localConfiguration = Substitute.For<IConfigurationPathProvider>();
+        _localConfiguration.GetConfigFilePath().Returns(LocalConfigPath);
+
         _fileSystem = new MockFileSystem();
         _fileSystem.AddDirectory(GetScopedConfigDirectoryPath(ConfigurationScope.System));
         _fileSystem.AddDirectory(GetScopedConfigDirectoryPath(ConfigurationScope.Global));
         _fileSystem.AddDirectory(GetScopedConfigDirectoryPath(ConfigurationScope.Local));
 
-        _configEditor = new JsonConfigurationEditor(_fileSystem);
+        _configEditor = new JsonConfigurationEditor(_systemConfiguration, _globalConfiguration, _localConfiguration, _fileSystem);
     }
 
     [Theory]
@@ -87,7 +105,9 @@ public class JsonConfigurationEditorTests
             bool b => b.ToString().ToLower(),
             _ => expectedValue.ToString()
         };
-        content.Should().Contain($"\"{key.Split(".")[1]}\": {(expectedValue is string ? $"\"{expectedValueString}\"" : expectedValueString)}");
+        content.Should()
+            .Contain(
+                $"\"{key.Split(".")[1]}\": {(expectedValue is string ? $"\"{expectedValueString}\"" : expectedValueString)}");
     }
 
     [Fact]
@@ -220,9 +240,9 @@ public class JsonConfigurationEditorTests
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the passed configuration scope value is not supported.</exception>
     private string GetScopedConfigFilePath(ConfigurationScope scope) => scope switch
     {
-        ConfigurationScope.System => SystemConfiguration.GetConfigFilePath(_fileSystem),
-        ConfigurationScope.Global => GlobalConfiguration.GetConfigFilePath(_fileSystem),
-        ConfigurationScope.Local => LocalConfiguration.GetConfigFilePath(_fileSystem),
+        ConfigurationScope.System => _systemConfiguration.GetConfigFilePath(),
+        ConfigurationScope.Global => _globalConfiguration.GetConfigFilePath(),
+        ConfigurationScope.Local => _localConfiguration.GetConfigFilePath(),
         ConfigurationScope.Unspecified => throw new ArgumentException("No configuration path defined.", nameof(scope)),
         _ => throw new ArgumentOutOfRangeException(nameof(scope), scope, null)
     };
