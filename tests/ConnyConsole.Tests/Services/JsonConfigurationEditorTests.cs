@@ -79,7 +79,7 @@ public class JsonConfigurationEditorTests
         // ($"Unsupported configuration scop
 
         // Assert
-        act.Should().Throw<ArgumentException>().Which.Message.Should().StartWith($"Unsupported configuration scope: {scope}");
+        act.Should().Throw<ArgumentException>().WithMessage($"Unsupported configuration scope: {scope}*");
     }
 
     [Theory]
