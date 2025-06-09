@@ -40,18 +40,18 @@ public static class ServiceCollectionExtensions
     // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IFileSystem, FileSystem>();
-        services.AddScoped<IEnvironmentProvider>(_ => SystemEnvironmentProvider.Instance);
+        services.AddTransient<IFileSystem, FileSystem>();
+        services.AddTransient<IEnvironmentProvider>(_ => SystemEnvironmentProvider.Instance);
 
-        services.AddKeyedScoped<IConfigurationPathProvider, SystemConfiguration>("System");
-        services.AddKeyedScoped<IConfigurationPathProvider, GlobalConfiguration>("Global");
-        services.AddKeyedScoped<IConfigurationPathProvider, LocalConfiguration>("Local");
+        services.AddKeyedTransient<IConfigurationPathProvider, SystemConfiguration>("System");
+        services.AddKeyedTransient<IConfigurationPathProvider, GlobalConfiguration>("Global");
+        services.AddKeyedTransient<IConfigurationPathProvider, LocalConfiguration>("Local");
 
-        services.AddScoped<ConsoleCancellationTokenSource>();
-        services.AddScoped<ILogService, LogService>();
-        services.AddScoped<IConfigurationEditor, JsonConfigurationEditor>();
+        services.AddTransient<ConsoleCancellationTokenSource>();
+        services.AddTransient<ILogService, LogService>();
+        services.AddTransient<IConfigurationEditor, JsonConfigurationEditor>();
 
-        services.AddScoped<IApp, App>();
+        services.AddTransient<IApp, App>();
 
         return services;
     }
@@ -60,22 +60,22 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCliParser(this IServiceCollection services)
     {
         // Arguments
-        services.AddScoped<MessageArgument>();
-        services.AddScoped<SettingKeyArgument>();
-        services.AddScoped<SettingValueArgument>();
+        services.AddTransient<MessageArgument>();
+        services.AddTransient<SettingKeyArgument>();
+        services.AddTransient<SettingValueArgument>();
 
         // Options
-        services.AddScoped<LocalOption>();
-        services.AddScoped<GlobalOption>();
-        services.AddScoped<SystemOption>();
-        services.AddScoped<CategoryOption>();
+        services.AddTransient<LocalOption>();
+        services.AddTransient<GlobalOption>();
+        services.AddTransient<SystemOption>();
+        services.AddTransient<CategoryOption>();
 
         // Commands
-        services.AddScoped<LogCommand>();
-        services.AddScoped<SetConfigCommand>();
-        services.AddScoped<ConfigCommand>();
+        services.AddTransient<LogCommand>();
+        services.AddTransient<SetConfigCommand>();
+        services.AddTransient<ConfigCommand>();
 
-        services.AddScoped<CliRootCommand>();
+        services.AddTransient<CliRootCommand>();
 
         return services;
     }

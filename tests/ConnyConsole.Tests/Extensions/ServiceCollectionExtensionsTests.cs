@@ -187,12 +187,12 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Theory]
-    [InlineData(typeof(IFileSystem), typeof(FileSystem), ServiceLifetime.Scoped)]
-    [InlineData(typeof(IApp), typeof(App), ServiceLifetime.Scoped)]
-    [InlineData(typeof(ConsoleCancellationTokenSource), typeof(ConsoleCancellationTokenSource), ServiceLifetime.Scoped)]
-    [InlineData(typeof(ILogService), typeof(LogService), ServiceLifetime.Scoped)]
-    [InlineData(typeof(IConfigurationEditor), typeof(JsonConfigurationEditor), ServiceLifetime.Scoped)]
-    public void AddServices_RegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    [InlineData(typeof(IFileSystem), typeof(FileSystem), ServiceLifetime.Transient)]
+    [InlineData(typeof(IApp), typeof(App), ServiceLifetime.Transient)]
+    [InlineData(typeof(ConsoleCancellationTokenSource), typeof(ConsoleCancellationTokenSource), ServiceLifetime.Transient)]
+    [InlineData(typeof(ILogService), typeof(LogService), ServiceLifetime.Transient)]
+    [InlineData(typeof(IConfigurationEditor), typeof(JsonConfigurationEditor), ServiceLifetime.Transient)]
+    public void AddServices_RegistrationLifetime_Transient(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
@@ -209,8 +209,8 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Theory]
-    [InlineData(typeof(IEnvironmentProvider), ServiceLifetime.Scoped)]
-    public void AddServices_FactoryRegistrationLifetime_Scoped(Type serviceType, ServiceLifetime lifetime)
+    [InlineData(typeof(IEnvironmentProvider), ServiceLifetime.Transient)]
+    public void AddServices_FactoryRegistrationLifetime_Transient(Type serviceType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
@@ -227,10 +227,10 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Theory]
-    [InlineData(typeof(IConfigurationPathProvider), typeof(SystemConfiguration), ServiceLifetime.Scoped)]
-    [InlineData(typeof(IConfigurationPathProvider), typeof(GlobalConfiguration), ServiceLifetime.Scoped)]
-    [InlineData(typeof(IConfigurationPathProvider), typeof(LocalConfiguration), ServiceLifetime.Scoped)]
-    public void AddServices_KeyedRegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    [InlineData(typeof(IConfigurationPathProvider), typeof(SystemConfiguration), ServiceLifetime.Transient)]
+    [InlineData(typeof(IConfigurationPathProvider), typeof(GlobalConfiguration), ServiceLifetime.Transient)]
+    [InlineData(typeof(IConfigurationPathProvider), typeof(LocalConfiguration), ServiceLifetime.Transient)]
+    public void AddServices_KeyedRegistrationLifetime_Transient(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
@@ -283,20 +283,20 @@ public class ServiceCollectionExtensionsTests
 
     [Theory]
     // Arguments
-    [InlineData(typeof(MessageArgument), typeof(MessageArgument), ServiceLifetime.Scoped)]
-    [InlineData(typeof(SettingKeyArgument), typeof(SettingKeyArgument), ServiceLifetime.Scoped)]
-    [InlineData(typeof(SettingValueArgument), typeof(SettingValueArgument), ServiceLifetime.Scoped)]
+    [InlineData(typeof(MessageArgument), typeof(MessageArgument), ServiceLifetime.Transient)]
+    [InlineData(typeof(SettingKeyArgument), typeof(SettingKeyArgument), ServiceLifetime.Transient)]
+    [InlineData(typeof(SettingValueArgument), typeof(SettingValueArgument), ServiceLifetime.Transient)]
     // Options
-    [InlineData(typeof(LocalOption), typeof(LocalOption), ServiceLifetime.Scoped)]
-    [InlineData(typeof(GlobalOption), typeof(GlobalOption), ServiceLifetime.Scoped)]
-    [InlineData(typeof(SystemOption), typeof(SystemOption), ServiceLifetime.Scoped)]
-    [InlineData(typeof(CategoryOption), typeof(CategoryOption), ServiceLifetime.Scoped)]
+    [InlineData(typeof(LocalOption), typeof(LocalOption), ServiceLifetime.Transient)]
+    [InlineData(typeof(GlobalOption), typeof(GlobalOption), ServiceLifetime.Transient)]
+    [InlineData(typeof(SystemOption), typeof(SystemOption), ServiceLifetime.Transient)]
+    [InlineData(typeof(CategoryOption), typeof(CategoryOption), ServiceLifetime.Transient)]
     // Commands
-    [InlineData(typeof(LogCommand), typeof(LogCommand), ServiceLifetime.Scoped)]
-    [InlineData(typeof(SetConfigCommand), typeof(SetConfigCommand), ServiceLifetime.Scoped)]
-    [InlineData(typeof(ConfigCommand), typeof(ConfigCommand), ServiceLifetime.Scoped)]
-    [InlineData(typeof(CliRootCommand), typeof(CliRootCommand), ServiceLifetime.Scoped)]
-    public void AddCliParser_RegistrationLifetime_Scoped(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    [InlineData(typeof(LogCommand), typeof(LogCommand), ServiceLifetime.Transient)]
+    [InlineData(typeof(SetConfigCommand), typeof(SetConfigCommand), ServiceLifetime.Transient)]
+    [InlineData(typeof(ConfigCommand), typeof(ConfigCommand), ServiceLifetime.Transient)]
+    [InlineData(typeof(CliRootCommand), typeof(CliRootCommand), ServiceLifetime.Transient)]
+    public void AddCliParser_RegistrationLifetime_Transient(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor
