@@ -402,3 +402,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Include CLI log command code
+!src/ConnyConsole/Cli/Log/
+!src/ConnyConsole/Cli/Log/**
