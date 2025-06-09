@@ -14,26 +14,23 @@
     ],
     "WriteTo": [
       {
-        "Name": "File",
+        "Name": "Console",
         "Args": {
-          "path": "Logs/On-.log",
-          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}",
-          "rollingInterval": "Day"
+          "outputTemplate": "{Message:lj}{NewLine}"
         }
       },
       {
-        "Name": "Console",
+        "Name": "File",
         "Args": {
-          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}"
+          "path": "Logs/On-.log",
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext}: {Message:lj}{NewLine}{Exception}",
+          "rollingInterval": "Day",
+          "retainedFileCountLimit": 5
         }
       }
     ],
     "Properties": {
       "Application": "ConnyConsole"
     }
-  },
-  "AppSettings": {
-    "LoopOutputInterval": "00:00:02",
-    "CancellationTimeout": "00:00:03"
   }
 }

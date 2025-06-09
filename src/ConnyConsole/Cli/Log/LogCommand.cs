@@ -1,10 +1,8 @@
 ﻿using System.CommandLine;
-using ConnyConsole.Cli.Arguments;
-using ConnyConsole.Cli.Options;
 using ConnyConsole.Services;
 using Microsoft.Extensions.Logging;
 
-namespace ConnyConsole.Cli.Commands;
+namespace ConnyConsole.Cli.Log;
 
 public sealed class LogCommand : Command
 {

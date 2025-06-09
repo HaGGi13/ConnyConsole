@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
 using Microsoft.Extensions.Logging;
 
-namespace ConnyConsole.Cli.Options;
+namespace ConnyConsole.Cli.Log;
 
 public sealed class CategoryOption : Option<LogLevel>
 {

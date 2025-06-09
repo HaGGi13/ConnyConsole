@@ -1,15 +1,14 @@
-﻿using ConnyConsole;
+﻿using System.IO.Abstractions;
+using ConnyConsole;
 using ConnyConsole.Extensions;
+using ConnyConsole.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Formatting.Display;
 
 Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(new MessageTemplateTextFormatter(
-        "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}"))
+    .AddDefaultConsoleLogger("{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u4}] {SourceContext} {Message:lj}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 Log.Logger.ForContext<Program>().Debug("Starting application");
@@ -21,10 +20,19 @@ try
         .ConfigureAppConfiguration((hostContext, hostConfig) =>
         {
             var env = hostContext.HostingEnvironment;
+            var fileSystem = new FileSystem();
 
-            hostConfig.AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true);
-            hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true,
-                reloadOnChange: true);
+            var systemConfiguration = new SystemConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
+            hostConfig.AddJsonFile(systemConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+
+            var globalConfiguration = new GlobalConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
+            hostConfig.AddJsonFile(globalConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+
+            var localConfiguration = new LocalConfiguration(fileSystem);
+            hostConfig.AddJsonFile(localConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+
+            hostConfig.AddJsonFile("Config/loggersettings.json", optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile($"Config/loggersettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
         })
         .ConfigureServices((hostContext, services) =>
         {

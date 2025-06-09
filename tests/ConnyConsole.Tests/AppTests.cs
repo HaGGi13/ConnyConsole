@@ -1,6 +1,7 @@
+using System.IO.Abstractions;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
-using ConnyConsole.Cli.Commands;
+using ConnyConsole.Cli;
 using ConnyConsole.Extensions;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Services;
@@ -14,25 +15,27 @@ namespace ConnyConsole.Tests;
 
 public class AppTests
 {
-    private readonly IOptions<AppSettings> _options;
+    private readonly IOptions<CancellationSettings> _cancellationOptions;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
     private readonly IServiceProvider _services;
 
     public AppTests()
     {
-        var settings = new AppSettings
-        {
-            CancellationTimeout = TimeSpan.FromMilliseconds(10),
-            LoopOutputInterval = TimeSpan.FromMilliseconds(50)
-        };
-        _options = Options.Create(settings);
+        var cancellationSettings = new CancellationSettings { Timeout = TimeSpan.FromMilliseconds(10) };
+        _cancellationOptions = Options.Create(cancellationSettings);
 
         var fixture = new Fixture().Customize(new AutoNSubstituteCustomization());
         _consoleCancellationTokenSource = fixture.Create<ConsoleCancellationTokenSource>();
 
         _services = new ServiceCollection()
             .AddFakeLogging()
+            .AddTransient<IFileSystem, FileSystem>()
+            .AddScoped<IEnvironmentProvider>(_ => SystemEnvironmentProvider.Instance)
+            .AddKeyedScoped<IConfigurationPathProvider, SystemConfiguration>("System")
+            .AddKeyedScoped<IConfigurationPathProvider, GlobalConfiguration>("Global")
+            .AddKeyedScoped<IConfigurationPathProvider, LocalConfiguration>("Local")
             .AddTransient<ILogService, LogService>()
+            .AddTransient<IConfigurationEditor, JsonConfigurationEditor>()
             .AddCliParser()
             .BuildServiceProvider();
     }
@@ -44,7 +47,7 @@ public class AppTests
         var rootCommand = _services.GetRequiredService<CliRootCommand>();
         var logger = new FakeLogger<App>();
 
-        var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);
+        var app = new App(_cancellationOptions, _consoleCancellationTokenSource, rootCommand, logger);
 
         // Act
         var runTask = Task.Run(async () => await app.RunAsync(["log", "test message"]).ConfigureAwait(false));
@@ -64,7 +67,7 @@ public class AppTests
         var rootCommand = _services.GetRequiredService<CliRootCommand>();
         var logger = new FakeLogger<App>();
 
-        var app = new App(_options, _consoleCancellationTokenSource, rootCommand, logger);
+        var app = new App(_cancellationOptions, _consoleCancellationTokenSource, rootCommand, logger);
 
         // Act
         var runTask = Task.Run(async () => await app.RunAsync(["foo", "bar"]).ConfigureAwait(false));

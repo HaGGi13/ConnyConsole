@@ -3,7 +3,9 @@
 namespace ConnyConsole.Infrastructure;
 
 /// <inheritdoc/>
-public class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSource> logger)
+public class ConsoleCancellationTokenSource(
+    ILogger<ConsoleCancellationTokenSource> logger,
+    IEnvironmentProvider environmentProvider)
     : CancellationTokenSource
 {
     private bool _isGracefulCancelled = true;
@@ -70,7 +72,7 @@ public class ConsoleCancellationTokenSource(ILogger<ConsoleCancellationTokenSour
     }
 
     /// <summary>
-    /// Terminate current process and return exit code 0 to the operating system.
+    /// Terminate the current process and return exit code 0 to the operating system.
     /// </summary>
-    protected virtual void ExitApplication() => Environment.Exit(0);
+    private void ExitApplication() => environmentProvider.Exit(0);
 }

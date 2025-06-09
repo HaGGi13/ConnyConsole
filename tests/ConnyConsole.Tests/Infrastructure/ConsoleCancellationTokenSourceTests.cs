@@ -1,20 +1,21 @@
 ﻿using System.Reflection;
 using ConnyConsole.Infrastructure;
-using ConnyConsole.Tests.TestHelpers;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Testing;
+using NSubstitute;
 
 namespace ConnyConsole.Tests.Infrastructure;
 
 public class ConsoleCancellationTokenSourceTests
 {
     private readonly FakeLogger<ConsoleCancellationTokenSource> _logger = new();
+    private readonly IEnvironmentProvider _environmentProvider = Substitute.For<IEnvironmentProvider>();
 
     [Fact]
     public void CreateCancellationHandler_ShouldLogsMessageAndExit_WhenOneInterruptWithTimeout()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
         var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
@@ -26,7 +27,7 @@ public class ConsoleCancellationTokenSourceTests
         // Assert
         tokenSource.IsCancellationRequested.Should().BeTrue();
         consoleCancelEventArgs.Cancel.Should().BeTrue();
-        tokenSource.ExitCalled.Should().BeTrue();
+        _environmentProvider.Received(1).Exit(0);
 
         var logMessages = _logger.Collector.GetSnapshot();
         logMessages.Should().HaveCount(2);
@@ -39,11 +40,11 @@ public class ConsoleCancellationTokenSourceTests
     public void CreateCancellationHandler_ShouldLogsMessageAndCancel_WhenOneInterruptWithoutTimeout()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
         var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
-        // Timout set to 3 to test case w/o timeout situation
+        // Timout set to 3, to test case w/o timeout situation
         var handler = tokenSource.CreateCancellationHandler(TimeSpan.FromSeconds(3));
         // First Ctrl + C
         handler.Invoke(null, consoleCancelEventArgs);
@@ -51,7 +52,7 @@ public class ConsoleCancellationTokenSourceTests
         // Assert
         tokenSource.IsCancellationRequested.Should().BeTrue();
         consoleCancelEventArgs.Cancel.Should().BeTrue();
-        tokenSource.ExitCalled.Should().BeFalse(); // graceful exit, not called yet because of timeout duration
+        _environmentProvider.DidNotReceive().Exit(0); // graceful exit, not called yet because of timeout duration
 
         var logMessages = _logger.Collector.GetSnapshot();
         logMessages.Should().ContainSingle();
@@ -63,7 +64,7 @@ public class ConsoleCancellationTokenSourceTests
     public void CreateCancellationHandler_ShouldLogsMessageAndExit_WhenTwoInterrupt()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
         var consoleCancelEventArgs = CreateConsoleCancelEventArgs(ConsoleSpecialKey.ControlC);
 
         // Act
@@ -76,7 +77,7 @@ public class ConsoleCancellationTokenSourceTests
         // Assert
         tokenSource.IsCancellationRequested.Should().BeTrue();
         consoleCancelEventArgs.Cancel.Should().BeTrue();
-        tokenSource.ExitCalled.Should().BeTrue();
+        _environmentProvider.Received(1).Exit(0);
 
         var logMessages = _logger.Collector.GetSnapshot();
         logMessages.Should().HaveCount(2);
@@ -91,7 +92,7 @@ public class ConsoleCancellationTokenSourceTests
     public void CreateCancellationHandler_ThrowsArgumentOutOfRangeException_WhenNegativeTimeout()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
 
         // Act
         // ReSharper disable once AccessToDisposedClosure
@@ -105,7 +106,7 @@ public class ConsoleCancellationTokenSourceTests
     public void CreateCancellationHandler_ThrowsArgumentOutOfRangeException_WhenMinValueTimeout()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
 
         // Act
         // ReSharper disable once AccessToDisposedClosure
@@ -119,7 +120,7 @@ public class ConsoleCancellationTokenSourceTests
     public void CreateCancellationHandler_ShouldNotThrowArgumentOutOfRangeException_WhenMaxValueTimeout()
     {
         // Arrange
-        using var tokenSource = new TestConsoleCancellationTokenSource(_logger);
+        using var tokenSource = new ConsoleCancellationTokenSource(_logger, _environmentProvider);
 
         // Act
         // ReSharper disable once AccessToDisposedClosure
@@ -131,6 +132,8 @@ public class ConsoleCancellationTokenSourceTests
 
     #endregion
 
+    #region Helper methids
+
     private static ConsoleCancelEventArgs CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
     {
         var consoleCancelEventArgsType = typeof(ConsoleCancelEventArgs);
@@ -138,4 +141,6 @@ public class ConsoleCancellationTokenSourceTests
 
         return (ConsoleCancelEventArgs)constructor.Invoke([key]);
     }
+
+    #endregion
 }

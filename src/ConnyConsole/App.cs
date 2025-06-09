@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using ConnyConsole.Cli.Commands;
+using ConnyConsole.Cli;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.Logging;
@@ -9,15 +9,17 @@ namespace ConnyConsole;
 
 public sealed class App : IApp
 {
-    private readonly AppSettings _appSettings;
+    private readonly CancellationSettings _cancellationSettings;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
     private readonly CliRootCommand _rootCommand;
     private readonly ILogger<App> _logger;
 
-    public App(IOptions<AppSettings> appSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource,
-         CliRootCommand rootCommand, ILogger<App> logger)
+    public const string Name = "ConnyConsole";
+
+    public App(IOptions<CancellationSettings> cancellationSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource,
+        CliRootCommand rootCommand, ILogger<App> logger)
     {
-        _appSettings = appSettings.Value;
+        _cancellationSettings = cancellationSettings.Value;
         _consoleCancellationTokenSource = consoleCancellationTokenSource;
         _rootCommand = rootCommand;
         _logger = logger;
@@ -35,6 +37,6 @@ public sealed class App : IApp
     private void RegisterConsoleCancellation()
     {
         Console.CancelKeyPress +=
-            _consoleCancellationTokenSource.CreateCancellationHandler(_appSettings.CancellationTimeout);
+            _consoleCancellationTokenSource.CreateCancellationHandler(_cancellationSettings.Timeout);
     }
 }

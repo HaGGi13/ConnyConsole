@@ -5,7 +5,7 @@ namespace ConnyConsole.Tests.TestHelpers;
 
 public static class TestConfiguration
 {
-    private const string Configuration =
+    private const string CompleteConfiguration =
         """
         {
           "Serilog": {
@@ -48,7 +48,30 @@ public static class TestConfiguration
         }
         """;
 
-    public static IConfigurationRoot GetConfiguration() => new ConfigurationBuilder()
-        .AddJsonStream(new MemoryStream(Encoding.ASCII.GetBytes(Configuration)))
-        .Build();
+    public const string ConfigurationWithEmptySerilog =
+        """
+        {
+          "Serilog": {
+          },
+          "AppSettings": {
+            "LoopOutputInterval": "00:00:02",
+            "CancellationTimeout": "00:00:03"
+          }
+        }
+        """;
+
+    public const string ConfigurationWithoutSerilog =
+        """
+        {
+          "AppSettings": {
+            "LoopOutputInterval": "00:00:02",
+            "CancellationTimeout": "00:00:03"
+          }
+        }
+        """;
+
+    public static IConfigurationRoot GetConfiguration(string jsonConfiguration = CompleteConfiguration) =>
+        new ConfigurationBuilder()
+            .AddJsonStream(new MemoryStream(Encoding.ASCII.GetBytes(jsonConfiguration)))
+            .Build();
 }
