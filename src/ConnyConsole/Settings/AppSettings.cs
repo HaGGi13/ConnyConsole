@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace ConnyConsole.Settings;
 
-public class AppSettings
+public sealed class AppSettings
 {
     public const string SectionName = "AppSettings";
 

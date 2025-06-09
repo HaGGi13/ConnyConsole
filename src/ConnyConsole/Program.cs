@@ -31,8 +31,8 @@ try
             var localConfiguration = new LocalConfiguration(fileSystem);
             hostConfig.AddJsonFile(localConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
 
-            hostConfig.AddJsonFile("Config/appsettings.json", optional: true, reloadOnChange: true);
-            hostConfig.AddJsonFile($"Config/appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile("Config/loggersettings.json", optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile($"Config/loggersettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
         })
         .ConfigureServices((hostContext, services) =>
         {

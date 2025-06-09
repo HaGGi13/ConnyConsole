@@ -33,11 +33,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Config\appsettings.json">
+    <None Update="Config\loggersettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Config\appsettings.*.json">
-      <DependentUpon>appsettings.json</DependentUpon>
+    <None Update="Config\loggersettings.*.json">
+      <DependentUpon>loggersettings.json</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
