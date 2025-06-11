@@ -17,27 +17,27 @@ ConnyConsole is a console CLI project that uses `System.CommandLine` from Micros
 
 ## Features
 
-This chapter gives a rough overview what was implemented as example implementation.
+This chapter gives a rough overview of what was implemented as an example implementation.
 
 ### Business code
 
 Please note that some the features listed are based on or inspired by the article series [A Beginner's Guide to .NET's HostBuilder: Part 1 and following][5].
 
-- Console startup implemented with **[Host.CreateDefaultBuilder][6]** that enables/contains following:
+- Console startup implemented with **[Host.CreateDefaultBuilder][6]** that enables/contains the following:
     - **Dependency injection** configuration via [`ConfigureServices`][7] and extension method to keep `Program.cs` simple;
         - Own extension method `AddConfiguration` registers all dependencies incl.:
             - Logger configuration with injected configuration;
             - Configuration registered for [options pattern][8];
     - **Loads configuration from specific subdirectory** `Config` that contains `appsettings.json` and `appsettings.Development.json`:
         - Current environment resolved from injected [`HostBuilderContext`][9] to use related `appsettings.json` file;
-        - `appsettings` files intentionally in subdirectory `Config` to have to define them specifically for loading, to cover case as example;
-- **[Serilog][10]** set up as logger:
+        - `appsettings` files intentionally in subdirectory `Config` to have to define them specifically for loading, to cover a case as example;
+- **[Serilog][10]** set up as a logger:
     - Startup-logger and injectable logger based on configuration files;
     - Logging into on console and file in defined format;
-    - Serilog can throw strange/not relatable exceptions during configuration, when JSON config is wrong, such exceptions will be printed on console;
+    - Serilog can throw strange/not relatable exceptions during configuration; when JSON config is wrong, such exceptions will be printed on the console;
 - Current _dummy_ logic executed async with **graceful and enforceable cancellation**;
     - First `[Ctrl] + [C]` or `[Ctrl] + [Break]` initiates graceful cancellation;
-        - Waits until logic finishes or configurable timeout reached and closes application;
+        - Waits until logic finishes or a configurable timeout reaches and closes the application;
     - Second `[Ctrl] + [C]` or `[Ctrl] + [Break]` initiates immediate enforced cancellation;
         - Application exists immediately;
     - All that magic happens in [`ConsoleCancellationTokenSource`][11] class;
@@ -46,11 +46,11 @@ Please note that some the features listed are based on or inspired by the articl
 
 ### Test code
 
-As an application is only as good as it was tested, this chapter gives some insights how the console application tests were implemented.
+As an application is only as good as it was tested, this chapter gives some insights into how the console application tests were implemented.
 
-- Unit tests implemented with following libraries/frameworks:
+- Unit tests are implemented with the following libraries/frameworks:
     - [AutoFixture.AutoNSubstitute][15]
-    - [AwesomeAssertions][16] (fully community driven fork of _FluentAssertions_)
+    - [AwesomeAssertions][16] (fully community-driven fork of _FluentAssertions_)
     - [NSubstitute][17]
     - [xUnit][14]
 - Graceful + enforced cancellation are tested with simulated `[Ctrl] + [C]` keys pressed ([`ConsoleCancellationTokenSourceTests.cs`][13]);
@@ -60,7 +60,7 @@ As an application is only as good as it was tested, this chapter gives some insi
 
 ### Pipeline
 
-This chapter provides an overview what the current build pipeline provides.
+This chapter provides an overview of what the current build pipeline provides.
 
 - [GitVersion][18] integrated for auto [SemVer (Semantic Versioning)][19] based on Git history;
 - [SonarQube][20] (cloud, free plan) integrated;
@@ -69,12 +69,12 @@ This chapter provides an overview what the current build pipeline provides.
     - Collect test run results as `*.trx` file;
     - Collect code coverage in `OpenCover` format, later on used to publish on SonarQube;
         - Done by using [coverlet.msbuild + coverlet.collector][21] (_in test project only_);
-    - Both files, coverage file and test result file, are published as build artifacts;
+    - Both files, the coverage file and test result file, are published as build artifacts;
     - Passed, failed and skipped tests listed as part of run summary, realized with [`GitHubActionsTestLogger`][22] package;
 
 ## References/documentation:
 
-Following are some used articles listed.
+The following are some used articles listed.
 - [Parse the Command Line with System.CommandLine][1]
 - [System.CommandLine overview][2]
 - [System.CommandLine on GitHub][3]
