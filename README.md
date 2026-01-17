@@ -20,7 +20,7 @@ experience with this library.
     - [Configuration duration parsing](#configuration-duration-parsing)
   - [Testability](#testability)
 - [Development](#development)
-  - [Testing code](#testing-code)
+  - [Test implementation](#test-implementation)
   - [Pipeline](#pipeline)
 - [References/documentation](#referencesdocumentation)
 
@@ -190,13 +190,13 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
 
 ## Testability
 
-- For the sake of testability environment and file system abstracted;
-  - File system and environment paths abstracted with [System.IO.Abstraction][26], unit tests can simulate System, Global, and Local directory structures without touching the actual developer's disk;
+- For the sake of testability environment and file system abstracted in CLI code;
+  - File system and environment paths abstracted with [TestableIO.System.IO.Abstractions.Wrappers (aka System.IO.Abstractions)][26], unit tests can simulate System, Global, and Local directory structures without touching the actual developer's disk;
   - The project uses the [`EnvironmentAbstractions`][27] package to ensure the configuration-level providers are testable;
 
 # Development
 
-## Testing code
+## Test implementation
 
 As an application is only as good as it was tested, this chapter gives some insights into how the console application
 tests were implemented.
@@ -204,7 +204,11 @@ tests were implemented.
 - Unit tests are implemented with the following libraries/frameworks:
   - [AutoFixture.AutoNSubstitute][15]
   - [AwesomeAssertions][16] (fully community-driven fork of _FluentAssertions_)
+  - [AwesomeAssertions.Analyzers][29] (supports to use AwesomeAssertions in correct way)
+  - [EnvironmentAbstractions.TestHelpers][27] (mock environment values)
   - [NSubstitute][17]
+  - [NSubstitute.Analyzers.CSharp][30] (supports to use NSubstitute in correct way)
+  - [TestableIO.System.IO.Abstractions.TestingHelpers][26]
   - [xUnit][14]
 - Graceful + enforced cancellation are tested with simulated `[Ctrl] + [C]` keys pressed ([
   `ConsoleCancellationTokenSourceTests.cs`][13]);
@@ -272,9 +276,12 @@ The following are some used articles listed.
 [23]: https://learn.microsoft.com/en-us/dotnet/api/system.environment.specialfolder?view=net-9.0 "MS Docs: Environment.SpecialFolder enum"
 [24]: src/ConnyConsole/Services/JsonConfigurationEditor.cs "JSON configuration editor"
 [25]: src/ConnyConsole/Settings/AppSettings.cs "AppSettings model incl. setting key exist check"
-[26]: https://github.com/TestableIO/System.IO.Abstractions "GitHub: System.IO.Abstractions"
+[26]: https://github.com/TestableIO/System.IO.Abstractions "GitHub: TestableIO.System.IO.Abstractions.Wrappers"
 [27]: https://github.com/jeffkl/EnvironmentAbstractions "GitHub: EnvironmentAbstractions"
 [28]: src/ConnyConsole/Settings/DurationTimeParser.cs "Duration parser implementation"
+[29]: https://github.com/AwesomeAssertions/AwesomeAssertions.analyzers "GitHub: AwesomeAssertions.Analyzers"
+[30]: https://github.com/nsubstitute/NSubstitute.Analyzers "GitHub: NSubstitute.Analyzers"
+
 
 <!--# badge image references -->
 
