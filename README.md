@@ -1,37 +1,35 @@
 [![Build and analyze][50]][70]
 [![Quality Gate Status][51]][71]
 
-# ConnyConsole
+<h1>ConnyConsole</h1>
 
 ConnyConsole is a console CLI project that uses `System.CommandLine` from Microsoft for argument parsing to collect some
 experience with this library.
 
-## Table of content
+<h2>Table of content</h2>
 
-- [ConnyConsole](#connyconsole)
-  - [Table of content](#table-of-content)
-  - [Features](#features)
-    - [Generic Host \& Dependency Injection](#generic-host--dependency-injection)
-    - [Structured Logging with Serilog](#structured-logging-with-serilog)
-    - [Cancellation \& Lifecycle Management](#cancellation--lifecycle-management)
-    - [Multi-Level Layered Configuration](#multi-level-layered-configuration)
-      - [Architecture Goals](#architecture-goals)
-      - [Hierarchy \& File Path Mapping](#hierarchy--file-path-mapping)
-      - [Configuration load and override flow](#configuration-load-and-override-flow)
-    - [Configuration Schema \& Validation](#configuration-schema--validation)
-      - [Configuration duration parsing](#configuration-duration-parsing)
-    - [Testability](#testability)
-  - [Development](#development)
-    - [Testing code](#testing-code)
-    - [Pipeline](#pipeline)
-  - [References/documentation](#referencesdocumentation)
+- [Features](#features)
+  - [Generic Host \& Dependency Injection](#generic-host--dependency-injection)
+  - [Structured Logging with Serilog](#structured-logging-with-serilog)
+  - [Cancellation \& Lifecycle Management](#cancellation--lifecycle-management)
+  - [Multi-Level Layered Configuration](#multi-level-layered-configuration)
+    - [Architecture Goals](#architecture-goals)
+    - [Hierarchy \& File Path Mapping](#hierarchy--file-path-mapping)
+    - [Configuration load and override flow](#configuration-load-and-override-flow)
+  - [Configuration Schema \& Validation](#configuration-schema--validation)
+    - [Configuration duration parsing](#configuration-duration-parsing)
+  - [Testability](#testability)
+- [Development](#development)
+  - [Testing code](#testing-code)
+  - [Pipeline](#pipeline)
+- [References/documentation](#referencesdocumentation)
 
-## Features
+# Features
 
 This chapter provides a rough overview what was implemented as examples.  
 Please note, some of the features listed are based on or inspired by the article series [A Beginner's Guide to .NET's HostBuilder: Part 1 and following][5].
 
-### Generic Host & Dependency Injection
+## Generic Host & Dependency Injection
 
 - Console startup implemented with **[Host.CreateDefaultBuilder][6]** that enables/contains the following:
   - **Dependency injection** configuration via [`ConfigureServices`][7] and extension method to keep `Program.cs` simple;
@@ -43,7 +41,7 @@ Please note, some of the features listed are based on or inspired by the article
     - Intentionally `appsettings` (here `loggersettings`) files located in subdirectory `Config` to enforce loading them in code explicitly (_as example to bypass appsettings load magic_);
     - Allows CLI to explicitly control the loading order and prioritize the layered configuration approach (System/Global/Local) while maintaining hard-coded default values for core logic;
 
-### Structured Logging with Serilog
+## Structured Logging with Serilog
 
 - **[Serilog][10]** used for logging:
   - Startup-logger and injectable logger based on configuration files (`loggersettings`);
@@ -52,7 +50,7 @@ Please note, some of the features listed are based on or inspired by the article
     - _when JSON config is wrong, this exceptions will be printed on the console;_
   - Logger configuration is stored in `loggersettings.json` file, because no `appsettings.json` file is used (default configuration is hard-coded);
 
-### Cancellation & Lifecycle Management
+## Cancellation & Lifecycle Management
 
 - **Graceful and enforceable cancellation** of current async executed _dummy_ logic;
   - First `[Ctrl] + [C]` or `[Ctrl] + [Break]` initiates graceful cancellation;
@@ -63,7 +61,7 @@ Please note, some of the features listed are based on or inspired by the article
   - Console cancellation event is registered in [`App`][12] class;
 - Console application **icon** defined (check `*.csproj` file tag `ApplicationIcon`);
 
-### Multi-Level Layered Configuration
+## Multi-Level Layered Configuration
 
 - Supporting a **layered configuration files approach**;
   - Possible to configure on each level the `Cancellation.Timeout` setting (right now no other settings are supported);
@@ -84,7 +82,7 @@ Please note, some of the features listed are based on or inspired by the article
          - Windows: `C:\Temp\.connyconsole\config`
          - Linux: `/c/Temp/.connyconsole/config`
 
-#### Architecture Goals
+### Architecture Goals
 
 - **Flexibility**
   - Can have a "safe" default (like a 30-second timeout) but easily change it to 5 seconds for just one specific project without editing the global files;
@@ -93,7 +91,7 @@ Please note, some of the features listed are based on or inspired by the article
 - **Predictable Order**
   - It creates a clear hierarchy (seen diagram _Configuration override order_) where the most "local" or "specific" setting always wins.
 
-#### Hierarchy & File Path Mapping
+### Hierarchy & File Path Mapping
 
 | **Configuration scope** | **Windows**                          | **Linux**                         | Description                                                                                                         |
 | :---------------------- | :----------------------------------- | :-------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
@@ -101,7 +99,7 @@ Please note, some of the features listed are based on or inspired by the article
 | **Global** (_User_)     | `C:\Users\<username>\.connyconfig`   | `~/home/<username>/.connyconfig`  | - Configuration file is applied to the user, who created it only;                                                   |
 | **Local**               | `C:\Temp\.connyconsole\config`       | `/c/Temp/.connyconsole/config`    | - Configuration file is applied to the current working directory only;<br/>- Example working directory is `C:\Temp` |
 
-#### Configuration load and override flow
+### Configuration load and override flow
 
 ```mermaid
 ---
@@ -137,7 +135,7 @@ graph TD
     D -->|Overwrites| E
 ```
 
-### Configuration Schema & Validation
+## Configuration Schema & Validation
 
 - **Configuration is stored in JSON format**, according to predefined and cross-checked setting keys;
 
@@ -180,7 +178,8 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
 }
 ```
 
-#### Configuration duration parsing
+### Configuration duration parsing
+
 - Duration configuration more user-friendly, custom [`DurationTimeParser`][28] implemented for time-based settings (like `Cancellation.Timeout`);
 - Allows users provide intuitive values instead of raw TimeSpan strings;
   - Supports various input formats such as:
@@ -189,15 +188,15 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
     - `5m` (minutes)
     - `1h` (hours)
 
-### Testability
+## Testability
 
 - For the sake of testability environment and file system abstracted;
   - File system and environment paths abstracted with [System.IO.Abstraction][26], unit tests can simulate System, Global, and Local directory structures without touching the actual developer's disk;
   - The project uses the [`EnvironmentAbstractions`][27] package to ensure the configuration-level providers are testable;
 
-## Development
+# Development
 
-### Testing code
+## Testing code
 
 As an application is only as good as it was tested, this chapter gives some insights into how the console application
 tests were implemented.
@@ -214,7 +213,7 @@ tests were implemented.
     in general;
 - Async dummy logic execution;
 
-### Pipeline
+## Pipeline
 
 This chapter provides an overview of what the current build pipeline provides.
 
@@ -229,7 +228,7 @@ This chapter provides an overview of what the current build pipeline provides.
   - Passed, failed and skipped tests listed as part of run summary, realized with [`GitHubActionsTestLogger`][22]
     package;
 
-## References/documentation
+# References/documentation
 
 The following are some used articles listed.
 
@@ -286,3 +285,4 @@ The following are some used articles listed.
 
 [70]: https://github.com/HaGGi13/ConnyConsole/actions/workflows/build-connyconsole.yaml "Build pipeline"
 [71]: https://sonarcloud.io/summary/new_code?id=HaGGi13_ConnyConsole "Latest new code analysis"
+[def]: #connyconsole
