@@ -3,8 +3,7 @@
 
 <h1>ConnyConsole</h1>
 
-ConnyConsole is a console CLI project that uses `System.CommandLine` from Microsoft for argument parsing to collect some
-experience with this library.
+ConnyConsole is a console CLI project that uses `System.CommandLine` from Microsoft for argument parsing to collect some experience with this library.
 
 <h2>Table of content</h2>
 
@@ -31,24 +30,25 @@ Please note, some of the features listed are based on or inspired by the article
 
 ## Generic Host & Dependency Injection
 
-- Console startup implemented with **[Host.CreateDefaultBuilder][6]** that enables/contains the following:
-  - **Dependency injection** configuration via [`ConfigureServices`][7] and extension method to keep `Program.cs` simple;
-    - Own extension method `AddConfiguration` registers all dependencies incl. the following:
-      - Logger is configured via configuration injection;
-      - Configuration registered for [options pattern][8] usage;
-  - **Loads configuration from specific subdirectory** `Config` that contains `appsettings.json` and `appsettings.Development.json`:
-    - Current environment resolved from injected [`HostBuilderContext`][9] to use environment specific setting file;
-    - Intentionally `appsettings` (here `loggersettings`) files located in subdirectory `Config` to enforce loading them in code explicitly (_as example to bypass appsettings load magic_);
-    - Allows CLI to explicitly control the loading order and prioritize the layered configuration approach (System/Global/Local) while maintaining hard-coded default values for core logic;
+- Console startup implemented with **[Host.CreateDefaultBuilder][6]** for dependency injection, configuration loading and logging integration;
+- **Dependency injection** configuration via [`ConfigureServices`][7] and extension method to keep `Program.cs` simple;
+  - Own extension method `AddConfiguration` registers all dependencies incl. the following:
+    - Logger is configured via configuration injection;
+    - Configuration registered for [options pattern][8] usage;
+- **Loads configuration from specific subdirectory** `Config` that contains `appsettings.json` and `appsettings.Development.json`:
+  - Current environment resolved from injected [`HostBuilderContext`][9] to use environment specific setting file;
+  - Intentionally `appsettings` (here `loggersettings`) files located in subdirectory `Config` to enforce loading them in code explicitly (_as example to bypass appsettings load magic_);
+  - Allows CLI to explicitly control the loading order and prioritize the layered configuration approach (System/Global/Local) while maintaining hard-coded default values for core logic;
+- Console application **icon** defined (check `*.csproj` file tag `ApplicationIcon`);
 
 ## Structured Logging with Serilog
 
-- **[Serilog][10]** used for logging:
-  - Startup-logger and injectable logger based on configuration files (`loggersettings`);
-  - Logging on console and in file with defined format;
-  - Serilog can throw strange/not relatable exceptions on app startup when its configured;
-    - _when JSON config is wrong, this exceptions will be printed on the console;_
-  - Logger configuration is stored in `loggersettings.json` file, because no `appsettings.json` file is used (default configuration is hard-coded);
+- Structured logging by using \*\*[Serilog][10];
+- Startup-logger and on startup configured based on configuration files (`loggersettings`) injectable logger;
+- Logging on console and in file with defined format;
+- Serilog can throw strange/not relatable exceptions on app startup when malformed/invalid JSON config is used;
+  - _Serilog configuration exceptions now printed on console during startup;_
+- Logger configuration is stored in `loggersettings.json` file, because no `appsettings.json` file is used (default configuration is hard-coded);
 
 ## Cancellation & Lifecycle Management
 
@@ -57,47 +57,46 @@ Please note, some of the features listed are based on or inspired by the article
     - Waits until logic finishes or a configurable timeout reaches and closes the application;
   - Second `[Ctrl] + [C]` or `[Ctrl] + [Break]` initiates immediate enforced cancellation;
     - Application exists immediately;
-  - All that magic happens in [`ConsoleCancellationTokenSource`][11] class;
-  - Console cancellation event is registered in [`App`][12] class;
-- Console application **icon** defined (check `*.csproj` file tag `ApplicationIcon`);
+- All that magic happens in [`ConsoleCancellationTokenSource`][11] class;
+- Console cancellation event is registered in [`App`][12] class;
 
 ## Multi-Level Layered Configuration
 
-- Supporting a **layered configuration files approach**;
-  - Possible to configure on each level the `Cancellation.Timeout` setting (right now no other settings are supported);
-  - In regard to the following listed configuration order, the next lower level overrides the one above (more global level):
-    1. **System-level**
-       - Configuration file is applied to all users of the system;
-       - Location: [`SpecialFolder.CommonApplicationData\ConnyConsole\config`][23]
-         - Windows: `C:\ProgramData\ConnyConsole\config`
-         - Linux: `~/usr/share/ConnyConsole/config`
-    2. **Global-level** (aka _User-level_)
-    - Configuration file is applied to the user, who created it only;
-    - Location: [`SpecialFolder.UserProfile\.connyconfig`][23]
-      - Windows: `C:\Users\<username>\.connyconfig`
-      - Linux: `~/home/<username>/.connyconfig`
-    3. **Local-level**
-       - Configuration file is applied to the current working directory only;
-       - Location, when current working directory would be `C:\Temp`
-         - Windows: `C:\Temp\.connyconsole\config`
-         - Linux: `/c/Temp/.connyconsole/config`
+- **Layered configuration files approach** supported;
+- Possible to configure on each level the `Cancellation.Timeout` setting (right now no other settings are supported);
+- In regard to the following listed configuration order, the next lower level overrides the one above (more global level):
+  1. **System-level**
+     - Configuration file is applied to all users of the system;
+     - Location: [`SpecialFolder.CommonApplicationData\ConnyConsole\config`][23]
+       - Windows: `C:\ProgramData\ConnyConsole\config`
+       - Linux: `~/usr/share/ConnyConsole/config`
+  2. **Global-level** (aka _User-level_)
+     - Configuration file is applied to the user, who created it only;
+     - Location: [`SpecialFolder.UserProfile\.connyconfig`][23]
+       - Windows: `C:\Users\<username>\.connyconfig`
+       - Linux: `~/home/<username>/.connyconfig`
+  3. **Local-level**
+     - Configuration file is applied to the current working directory only;
+     - Location, when current working directory would be `C:\Temp`
+       - Windows: `C:\Temp\.connyconsole\config`
+       - Linux: `/c/Temp/.connyconsole/config`
 
 ### Architecture Goals
 
 - **Flexibility**
   - Can have a "safe" default (like a 30-second timeout) but easily change it to 5 seconds for just one specific project without editing the global files;
 - **Separation of Concerns**
-  - It distinguishes between settings that belong to the machine, the developer, and the workspace;
+  - Distinguishes between settings that belong to machine, developer, and workspace;
 - **Predictable Order**
-  - It creates a clear hierarchy (seen diagram _Configuration override order_) where the most "local" or "specific" setting always wins.
+  - Creates clear hierarchy (see diagram _Configuration override order_) where most "local" or "specific" setting always wins;
 
 ### Hierarchy & File Path Mapping
 
-| **Configuration scope** | **Windows**                          | **Linux**                         | Description                                                                                                         |
-| :---------------------- | :----------------------------------- | :-------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **System**              | `C:\ProgramData\ConnyConsole\config` | `~/usr/share/ConnyConsole/config` | - Configuration file is applied to all users of the system;                                                         |
-| **Global** (_User_)     | `C:\Users\<username>\.connyconfig`   | `~/home/<username>/.connyconfig`  | - Configuration file is applied to the user, who created it only;                                                   |
-| **Local**               | `C:\Temp\.connyconsole\config`       | `/c/Temp/.connyconsole/config`    | - Configuration file is applied to the current working directory only;<br/>- Example working directory is `C:\Temp` |
+| **Configuration scope** | **Windows**                          | **Linux**                         | Description                                                                                                          |
+| :---------------------- | :----------------------------------- | :-------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **System**              | `C:\ProgramData\ConnyConsole\config` | `~/usr/share/ConnyConsole/config` | - Configuration file is applied to all users of the system;                                                          |
+| **Global** (_User_)     | `C:\Users\<username>\.connyconfig`   | `~/home/<username>/.connyconfig`  | - Configuration file is applied to the user, who created it only;                                                    |
+| **Local**               | `C:\Temp\.connyconsole\config`       | `/c/Temp/.connyconsole/config`    | - Configuration file is applied to the current working directory only;<br/>- Example working directory is `C:\Temp`; |
 
 ### Configuration load and override flow
 
@@ -138,16 +137,15 @@ graph TD
 ## Configuration Schema & Validation
 
 - **Configuration is stored in JSON format**, according to predefined and cross-checked setting keys;
-
-  - During configuration via CLI a setting key describes its nested level using a dot '.' as a separator;
-    - `ConnyConfig config set Cancellation.Timeout 1s`
-    - This configures the `Timeout` setting that is nested in the `Cancellation` setting;
-  - **Case-Sensitivity**: Note that setting keys for the `config set` command are **case-sensitive** to match the internal schema and JSON property naming;
-  - **Validation via Schema**: Supported setting keys are hard-coded in a `Dictionary<string, object>` within the [AppSettings model][25];
-    - Dictionary uses boolean values (`true`) to mark leaf nodes (actual settings) and nested dictionaries to represent the hierarchy;
-    - Before value is written, editor verifies that provided key path exists within schema;
-  - **Configuration Editor**: The [`JsonConfigurationEditor`][24] manages the physical file I/O;
-    - Parses existing JSON (if any), traverses the tree according to the dot-notation key, and either updates existing value or creates necessary objects to reach the new setting;
+- During configuration via CLI a setting key describes its nested level using a dot '.' as a separator;
+  - For instance: `ConnyConfig config set Cancellation.Timeout 1s`
+  - Example above Configures `Timeout` setting that is nested in `Cancellation` setting;
+- **Case-Sensitivity**: Note that setting keys for the `config set` command are **case-sensitive** to match the internal schema and JSON property naming;
+- **Validation via Schema**: Supported setting keys are hard-coded in a `Dictionary<string, object>` within the [AppSettings model][25];
+  - Dictionary uses boolean values (`true`) to mark leaf nodes (actual settings) and nested dictionaries to represent the hierarchy;
+  - Before value is written, editor verifies that provided key path exists within schema;
+- **Configuration Editor**: The [`JsonConfigurationEditor`][24] manages the physical file I/O;
+  - Parses existing JSON (if any), traverses the tree according to the dot-notation key, and either updates existing value or creates necessary objects to reach the new setting;
 
 ```csharp
 // Example: How supported configuration keys are defined in the schema
@@ -198,8 +196,7 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
 
 ## Test implementation
 
-As an application is only as good as it was tested, this chapter gives some insights into how the console application
-tests were implemented.
+As an application is only as good as it was tested, this chapter gives some insights into how the console application tests were implemented.
 
 - Unit tests are implemented with the following libraries/frameworks:
   - [AutoFixture.AutoNSubstitute][15]
@@ -210,11 +207,9 @@ tests were implemented.
   - [NSubstitute.Analyzers.CSharp][30] (supports to use NSubstitute in correct way)
   - [TestableIO.System.IO.Abstractions.TestingHelpers][26]
   - [xUnit][14]
-- Graceful + enforced cancellation are tested with simulated `[Ctrl] + [C]` keys pressed ([
-  `ConsoleCancellationTokenSourceTests.cs`][13]);
+- Graceful + enforced cancellation are tested with simulated `[Ctrl] + [C]` keys pressed ([`ConsoleCancellationTokenSourceTests.cs`][13]);
 - Dependency injection extension method incl. lifetime checks;
-  - Lifetime check helps to notice fast if a lifetime was changed by accident or just to highlight that it was changed
-    in general;
+  - Lifetime check helps to notice fast if a lifetime was changed by accident or just to highlight that it was changed in general;
 - Async dummy logic execution;
 
 ## Pipeline
@@ -229,8 +224,7 @@ This chapter provides an overview of what the current build pipeline provides.
   - Collect code coverage in `OpenCover` format, later on used to publish on SonarQube;
     - Done by using [coverlet.msbuild + coverlet.collector][21] (_in test project only_);
   - Both files, the coverage file and test result file, are published as build artifacts;
-  - Passed, failed and skipped tests listed as part of run summary, realized with [`GitHubActionsTestLogger`][22]
-    package;
+  - Passed, failed and skipped tests listed as part of run summary, realized with [`GitHubActionsTestLogger`][22] package;
 
 # References/documentation
 
@@ -282,7 +276,6 @@ The following are some used articles listed.
 [29]: https://github.com/AwesomeAssertions/AwesomeAssertions.analyzers "GitHub: AwesomeAssertions.Analyzers"
 [30]: https://github.com/nsubstitute/NSubstitute.Analyzers "GitHub: NSubstitute.Analyzers"
 
-
 <!--# badge image references -->
 
 [50]: https://github.com/HaGGi13/ConnyConsole/actions/workflows/build-connyconsole.yaml/badge.svg
@@ -292,4 +285,3 @@ The following are some used articles listed.
 
 [70]: https://github.com/HaGGi13/ConnyConsole/actions/workflows/build-connyconsole.yaml "Build pipeline"
 [71]: https://sonarcloud.io/summary/new_code?id=HaGGi13_ConnyConsole "Latest new code analysis"
-[def]: #connyconsole

@@ -20,8 +20,10 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 [*.{md,txt}]
-indent_size = 4
+indent_size = 2
 trim_trailing_whitespace = false
+# Rider specific configuration
+ij_markdown_wrap_long_text = false
 
 [*.cs]
 indent_size = 4
