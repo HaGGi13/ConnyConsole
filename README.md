@@ -140,6 +140,12 @@ graph TD
 - During configuration via CLI a setting key describes its nested level using a dot '.' as a separator;
   - For instance: `ConnyConfig config set Cancellation.Timeout 1s`
   - Example above Configures `Timeout` setting that is nested in `Cancellation` setting;
+- **Scope Selection**: By default, `config set` targets **Local** scope, other levels can be target using flags:
+  - `-l`, `--local`: Targets current working directory (default);
+  - `-g`, `--global`: Targets global User-level configuration;
+  - `-s`, `--system`: Targets System-level configuration;
+  - *Note: Scope flags are mutually exclusive; only one can be used at a time*
+  - `ConnyConsole config set <key> <value> [[-l|--local]|[-g|--global]|[-s|--system]]`
 - **Case-Sensitivity**: Note that setting keys for the `config set` command are **case-sensitive** to match the internal schema and JSON property naming;
 - **Validation via Schema**: Supported setting keys are hard-coded in a `Dictionary<string, object>` within the [AppSettings model][25];
   - Dictionary uses boolean values (`true`) to mark leaf nodes (actual settings) and nested dictionaries to represent the hierarchy;
@@ -181,10 +187,10 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
 - Duration configuration more user-friendly, custom [`DurationTimeParser`][28] implemented for time-based settings (like `Cancellation.Timeout`);
 - Allows users provide intuitive values instead of raw TimeSpan strings;
   - Supports various input formats such as:
-    - `500ms` (milliseconds)
-    - `10s` (seconds)
-    - `5m` (minutes)
-    - `1h` (hours)
+    - **Standard format**: `00:00:30` or `1.12:00:00` (1 day, 12 hours)
+    - **Short suffixes**: `500ms`, `10s`, `5m`, `1h`, `2d`
+    - **Full words**: `30 seconds`, `5 minutes`, `1 day`
+    - **Combinations**: `1h 30m`, `2 days 4 hours 15m 30s`
 
 ## Testability
 
