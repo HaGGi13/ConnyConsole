@@ -27,12 +27,12 @@ jobs:
         fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis and for GitVersion based versioning
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v3.1.11
+      uses: gittools/actions/gitversion/setup@v4.2.0
       with:
         versionSpec: '6.0.x'
     - name: Determine Version
       id: version_step # step id used as reference for output values
-      uses: gittools/actions/gitversion/command@v3.1.11
+      uses: gittools/actions/gitversion/command@v4.2.0
       with:
         arguments: '/output buildserver /l console /config GitVersion.yaml /updateprojectfiles' # have to self-define all arguments; /updateprojectfiles not impl. in execute task
 
