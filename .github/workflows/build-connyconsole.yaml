@@ -1,4 +1,5 @@
 name: Build and analyze
+run-name: ${{ env.GitVersion_FullSemVer }}
 
 on:
   push:
