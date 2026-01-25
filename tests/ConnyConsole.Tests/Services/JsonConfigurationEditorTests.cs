@@ -1,8 +1,8 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
+using AwesomeAssertions;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
-using FluentAssertions;
 using NSubstitute;
 
 namespace ConnyConsole.Tests.Services;

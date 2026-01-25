@@ -1,5 +1,5 @@
-﻿using ConnyConsole.Services;
-using FluentAssertions;
+﻿using AwesomeAssertions;
+using ConnyConsole.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 

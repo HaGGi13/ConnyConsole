@@ -1,6 +1,6 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
+using AwesomeAssertions;
 using ConnyConsole.Infrastructure;
-using FluentAssertions;
 
 namespace ConnyConsole.Tests.Infrastructure;
 

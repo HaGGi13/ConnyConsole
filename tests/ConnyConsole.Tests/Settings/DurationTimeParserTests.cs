@@ -1,5 +1,5 @@
-﻿using ConnyConsole.Settings;
-using FluentAssertions;
+﻿using AwesomeAssertions;
+using ConnyConsole.Settings;
 
 namespace ConnyConsole.Tests.Settings;
 

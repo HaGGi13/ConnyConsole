@@ -1,8 +1,8 @@
 ﻿using System.CommandLine;
+using AwesomeAssertions;
 using ConnyConsole.Cli.Config;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
-using FluentAssertions;
 using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 
