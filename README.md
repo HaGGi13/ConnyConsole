@@ -19,6 +19,7 @@ ConnyConsole is a console CLI project that uses `System.CommandLine` from Micros
     - [Configuration duration parsing](#configuration-duration-parsing)
   - [Testability](#testability)
 - [Development](#development)
+  - [Central Package Management](#central-package-management)
   - [Test implementation](#test-implementation)
   - [Pipeline](#pipeline)
 - [References/documentation](#referencesdocumentation)
@@ -200,6 +201,19 @@ private static readonly Dictionary<string, object> SupportedSettingKeys = new()
 
 # Development
 
+The Development chapter provides an overview of the project’s development setup: how NuGet dependencies and shared build settings are centralized (CPM and shared MSBuild props), which libraries and patterns are used for testing, and what the CI pipeline runs to build, test, and publish results.
+
+## Central Package Management
+
+[Central Package Management (CPM)][31] is used in ConnyConsole to ensure that all NuGet package versions are defined in a single place. This prevents version drift, simplifies upgrades, and keeps the solution consistent across all projects.
+
+- `Directory.Packages.props` file located at the solution root level and contains all packages used by projects (`*.csproj`)
+- **How to add a new package** that is used within the solution/a project
+  - Package must be added in `Directory.Packages.props` w/ version
+    - `<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />`
+  - To define in which project it is used, define it w/o in project's `*.csproj`
+    - `<PackageVersion Include="Newtonsoft.Json" />`
+
 ## Test implementation
 
 As an application is only as good as it was tested, this chapter gives some insights into how the console application tests were implemented.
@@ -281,6 +295,7 @@ The following are some used articles listed.
 [28]: src/ConnyConsole/Settings/DurationTimeParser.cs "Duration parser implementation"
 [29]: https://github.com/AwesomeAssertions/AwesomeAssertions.analyzers "GitHub: AwesomeAssertions.Analyzers"
 [30]: https://github.com/nsubstitute/NSubstitute.Analyzers "GitHub: NSubstitute.Analyzers"
+[31]: https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management "MSDocs: Central Package Management - (CPM)"
 
 <!--# badge image references -->
 
