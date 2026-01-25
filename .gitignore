@@ -32,6 +32,17 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# JetBrains Rider (.idea)
+# Ignore entire .idea folder by default
+.idea/
+# Allow shared project-level settings
+!.idea/.idea.*/.idea/codeStyles/
+!.idea/.idea.*/.idea/inspectionProfiles/
+!.idea/.idea.*/.idea/dotnet*.xml
+!.idea/.idea.*/.idea/vcs.xml
+!.idea/.idea.*/.idea/indexLayout.xml
+!.idea/.idea.*/.idea/projectSettingsUpdater.xml
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
@@ -322,10 +333,6 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
-# JetBrains Rider
-.idea/
-*.sln.iml
-
 # CodeRush personal settings
 .cr/personal
 
@@ -399,9 +406,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
-
-# JetBrains Rider
-*.sln.iml
 
 # Include CLI log command code
 !src/ConnyConsole/Cli/Log/
