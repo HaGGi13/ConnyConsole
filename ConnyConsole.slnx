@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="src/ConnyConsole/ConnyConsole.csproj" />
+  <Project Path="tests/ConnyConsole.Tests/ConnyConsole.Tests.csproj" />
+</Solution>
