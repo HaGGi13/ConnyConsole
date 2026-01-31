@@ -1,5 +1,4 @@
-﻿using System.CommandLine;
-using AwesomeAssertions;
+﻿using AwesomeAssertions;
 using ConnyConsole.Cli.Config;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
@@ -77,7 +76,7 @@ public class SetConfigCommandTests
         var arguments = $"set {key} {value} {systemFlag} {globalFlag} {localFlag}".Trim();
 
         // Act
-        var result = _command.Invoke(arguments);
+        var result = _command.Parse(arguments).Invoke();
 
         // Assert
         result.Should().Be(0); // Command should succeed
@@ -96,7 +95,7 @@ public class SetConfigCommandTests
         const string value = "30s";
 
         // Act
-        var result = _command.Invoke($"set {key} {value} --global --system");
+        var result = _command.Parse($"set {key} {value} --global --system").Invoke();
 
         // Assert
         result.Should().Be(1); // Command should fail
@@ -115,7 +114,7 @@ public class SetConfigCommandTests
             .Throw(exception);
 
         // Act
-        var result = _command.Invoke($"set {key} {value}");
+        var result = _command.Parse($"set {key} {value}").Invoke();
 
         // Assert
         result.Should().Be(0);
@@ -131,7 +130,7 @@ public class SetConfigCommandTests
     public void Handle_InvalidKey_LogsError(string? key)
     {
         // Act
-        var result = _command.Invoke($"set {key} value");
+        var result = _command.Parse($"set {key} value").Invoke();
 
         // Assert
         result.Should().Be(1); // Command should fail

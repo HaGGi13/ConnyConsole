@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.Logging;
@@ -15,43 +16,74 @@ public sealed class SetConfigCommand : Command
         ILogger<SetConfigCommand> logger)
         : base("set", "Sets a configuration value for a defined configuration scope.")
     {
-        AddArgument(settingKey);
-        AddArgument(settingValue);
+        Arguments.Add(settingKey);
+        Arguments.Add(settingValue);
 
-        AddOption(localOption); // is applicable, but anyway local is the default behavior, so it's ignored
-        AddOption(globalOption);
-        AddOption(systemOption);
+        Options.Add(localOption); // is applicable, but anyway local is the default behavior, so it's ignored
+        Options.Add(globalOption);
+        Options.Add(systemOption);
 
         _configurationEditor = configurationEditor;
         _logger = logger;
 
-        AddConfigurationScopeValidator(localOption, globalOption, systemOption);
+        Validators.Add(result => ConfigurationScopeValidator(result, localOption, globalOption, systemOption));
 
-        this.SetHandler(Handle, settingKey, settingValue, globalOption, systemOption);
+        SetAction(result => Handle(result, settingKey, settingValue));
     }
 
     /// <summary>
-    /// Adds a validator to ensure that only one of the specified options is used at a time.
+    /// Ensures that only one configuration scope option (e.g., local, global, or system)
+    /// is specified at any given time when executing the command.
     /// </summary>
-    /// <param name="options">The set of options to validate for exclusive usage.</param>
-    private void AddConfigurationScopeValidator(params Option<bool>[] options)
+    /// <param name="commandResult">The result of the executed command, containing the parsed options.</param>
+    /// <param name="mutexedConfigScopeOptions">The set of configuration scope options to validate for mutual exclusivity.</param>
+    private static void ConfigurationScopeValidator(CommandResult commandResult, params Option[] mutexedConfigScopeOptions)
     {
-        this.AddValidator(result =>
-        {
-            var optionNames = options.Select(s => s.Name);
-            var optionsUsedCount = result.Children.Count(s => optionNames.Contains(s.Symbol.Name));
+        var hasConflictingScopes = mutexedConfigScopeOptions.Count(o => commandResult.GetResult(o) is not null) > 1;
 
-            if (optionsUsedCount > 1)
-            {
-                result.ErrorMessage = "Only one configuration scope can be used at a time.";
-            }
-        });
+        if (hasConflictingScopes)
+        {
+            commandResult.AddError("Only one configuration scope can be used at a time.");
+        }
     }
 
-    private void Handle(string key, string value, bool isGlobal, bool isSystem)
+    /// <summary>
+    /// Handles the logic for setting a configuration value based on the provided command-line arguments
+    /// and options, including determining the appropriate configuration scope.
+    /// </summary>
+    /// <param name="parseResult">The result of parsing the command-line input, containing argument and option values.</param>
+    /// <param name="keyArgument">The argument representing the configuration key to be set.</param>
+    /// <param name="valueArgument">The argument representing the value to assign to the configuration key.</param>
+    private void Handle(ParseResult parseResult, SettingKeyArgument keyArgument, SettingValueArgument valueArgument)
+    {
+        try
+        {
+            var key = parseResult.GetRequiredValue(keyArgument);
+            var value = parseResult.GetRequiredValue(valueArgument);
+
+            var scope = GetConfigurationScope(parseResult);
+
+            var resultMessage = _configurationEditor.SetValue(key, value, scope);
+            _logger.LogInformation("Set setting result: {Message}", resultMessage);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Set setting error occured: {ErrorMessage}", exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// Determines the configuration scope (local, global, or system) based on the parsed command-line arguments.
+    /// </summary>
+    /// <param name="parseResult">The result from parsing the command-line input, containing options and arguments.</param>
+    /// <returns>The configuration scope to be used, defaulting to local if neither global nor system is specified.</returns>
+    private ConfigurationScope GetConfigurationScope(ParseResult parseResult)
     {
         // Local is the default behavior and overridden by global or system, if provided
         var scope = ConfigurationScope.Local;
+
+        var isGlobal = parseResult.GetValue(Options.OfType<GlobalOption>().First());
+        var isSystem = parseResult.GetValue(Options.OfType<SystemOption>().First());
 
         if (isGlobal)
         {
@@ -62,14 +94,6 @@ public sealed class SetConfigCommand : Command
             scope = ConfigurationScope.System;
         }
 
-        try
-        {
-            var resultMessage = _configurationEditor.SetValue(key, value, scope);
-            _logger.LogInformation("Set setting result: {Message}", resultMessage);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Set setting error occured: {ErrorMessage}", e.Message);
-        }
+        return scope;
     }
 }
