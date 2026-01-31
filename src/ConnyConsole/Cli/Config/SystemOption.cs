@@ -4,9 +4,9 @@ namespace ConnyConsole.Cli.Config;
 
 public sealed class SystemOption : Option<bool>
 {
-    public SystemOption()
-        : base(aliases: ["-s", "--system"], "Set the configuration on system-level for all users.")
+    public SystemOption() : base("--system", "-s")
     {
+        Description = "Set the configuration on system-level for all users.";
         AllowMultipleArgumentsPerToken = false;
     }
 }

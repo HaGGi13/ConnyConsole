@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
+using AwesomeAssertions;
 using ConnyConsole.Infrastructure;
-using FluentAssertions;
 using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
 

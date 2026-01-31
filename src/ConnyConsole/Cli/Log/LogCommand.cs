@@ -1,28 +1,32 @@
 ﻿using System.CommandLine;
 using ConnyConsole.Services;
-using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Cli.Log;
 
 public sealed class LogCommand : Command
 {
     private readonly ILogService _logService;
+    private readonly MessageArgument _messageArgument;
+    private readonly CategoryOption _categoryOption;
 
     public LogCommand(MessageArgument messageArgument, CategoryOption categoryOption, ILogService logService)
         : base("log", "Writes a message to the logs.")
     {
+        _messageArgument = messageArgument;
+        _categoryOption = categoryOption;
         _logService = logService;
 
-        AddAlias("l");
+        Aliases.Add("l");
 
-        AddArgument(messageArgument);
-        AddOption(categoryOption);
+        Arguments.Add(messageArgument);
 
-        this.SetHandler(Handle, categoryOption, messageArgument);
+        Options.Add(categoryOption);
+
+        SetAction(Handle);
     }
 
-    private void Handle(LogLevel level, string message)
+    private void Handle(ParseResult parseResult)
     {
-        _logService.Log(level, message);
+        _logService.Log(parseResult.GetValue(_categoryOption), parseResult.GetValue(_messageArgument));
     }
 }

@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using AutoFixture;
 using AutoFixture.AutoNSubstitute;
+using AwesomeAssertions;
 using ConnyConsole.Cli;
 using ConnyConsole.Cli.Config;
 using ConnyConsole.Cli.Log;
@@ -9,7 +10,6 @@ using ConnyConsole.Infrastructure;
 using ConnyConsole.Services;
 using ConnyConsole.Settings;
 using ConnyConsole.Tests.TestHelpers;
-using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

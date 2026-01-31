@@ -8,7 +8,7 @@ public sealed class CliRootCommand : RootCommand
 {
     public CliRootCommand(LogCommand logCommand, ConfigCommand configCommand) : base("ConnyConsole - an example implementation")
     {
-        AddCommand(logCommand);
-        AddCommand(configCommand);
+        Subcommands.Add(logCommand);
+        Subcommands.Add(configCommand);
     }
 }

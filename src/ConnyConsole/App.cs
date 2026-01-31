@@ -1,5 +1,4 @@
-﻿using System.CommandLine;
-using ConnyConsole.Cli;
+﻿using ConnyConsole.Cli;
 using ConnyConsole.Infrastructure;
 using ConnyConsole.Settings;
 using Microsoft.Extensions.Logging;
@@ -31,7 +30,7 @@ public sealed class App : IApp
     {
         _logger.LogDebug("Start processing commands...");
 
-        return _rootCommand.InvokeAsync(arguments);
+        return _rootCommand.Parse(arguments).InvokeAsync();
     }
 
     private void RegisterConsoleCancellation()
