@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ConnyConsole.Cli.Config;
 
-public sealed class SetConfigCommand : Command
+public sealed partial class SetConfigCommand : Command
 {
     private readonly IConfigurationEditor _configurationEditor;
     private readonly ILogger _logger;
@@ -64,7 +64,7 @@ public sealed class SetConfigCommand : Command
             var scope = GetConfigurationScope(parseResult);
 
             var resultMessage = _configurationEditor.SetValue(key, value, scope);
-            _logger.LogInformation("Set setting result: {Message}", resultMessage);
+            LogSetSettingResultMessage(resultMessage);
         }
         catch (Exception exception)
         {
