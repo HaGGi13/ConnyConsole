@@ -19,8 +19,8 @@ namespace ConnyConsole.Tests.Extensions;
 
 public class ServiceCollectionExtensionsTests
 {
-    private readonly IServiceCollection _services;
     private readonly HostBuilderContext _hostBuilderContext;
+    private readonly IServiceCollection _services;
 
     public ServiceCollectionExtensionsTests()
     {
@@ -166,7 +166,7 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Theory]
-    [InlineData(typeof(IConfigurationPathProvider),"System", typeof(SystemConfiguration))]
+    [InlineData(typeof(IConfigurationPathProvider), "System", typeof(SystemConfiguration))]
     [InlineData(typeof(IConfigurationPathProvider), "Global", typeof(GlobalConfiguration))]
     [InlineData(typeof(IConfigurationPathProvider), "Local", typeof(LocalConfiguration))]
     public void AddServices_KeyedDependencyRegistration_SuccessfulResolvable(Type toResolve, string serviceKey, Type targetType)
@@ -230,7 +230,8 @@ public class ServiceCollectionExtensionsTests
     [InlineData(typeof(IConfigurationPathProvider), typeof(SystemConfiguration), ServiceLifetime.Transient)]
     [InlineData(typeof(IConfigurationPathProvider), typeof(GlobalConfiguration), ServiceLifetime.Transient)]
     [InlineData(typeof(IConfigurationPathProvider), typeof(LocalConfiguration), ServiceLifetime.Transient)]
-    public void AddServices_KeyedRegistrationLifetime_Transient(Type serviceType, Type implementationType, ServiceLifetime lifetime)
+    public void AddServices_KeyedRegistrationLifetime_Transient(Type serviceType, Type implementationType,
+        ServiceLifetime lifetime)
     {
         // Arrange
         // nothing to do - already happen in ctor

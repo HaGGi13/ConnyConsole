@@ -21,10 +21,7 @@ public sealed class LocalConfiguration : IConfigurationPathProvider
     /// <param name="fileSystem">
     /// Abstraction instance of the file system. This allows for testability and abstraction of file system operations.
     /// </param>
-    public LocalConfiguration(IFileSystem fileSystem)
-    {
-        _fileSystem = fileSystem;
-    }
+    public LocalConfiguration(IFileSystem fileSystem) => _fileSystem = fileSystem;
 
     /// <summary>
     /// Returns the local (working directory) configuration file's full path.

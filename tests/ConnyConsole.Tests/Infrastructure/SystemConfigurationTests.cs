@@ -10,11 +10,11 @@ public sealed class SystemConfigurationTests
     private const string CommonAppDataPath = @"C:\ProgramData";
     private const string ConfigDirectoryName = "ConnyConsole";
     private const string ConfigFileName = "config";
+    private readonly IEnvironmentProvider _environment;
 
     private readonly string _expectedFilePath;
 
     private readonly MockFileSystem _fileSystem;
-    private readonly IEnvironmentProvider _environment;
 
     public SystemConfigurationTests()
     {

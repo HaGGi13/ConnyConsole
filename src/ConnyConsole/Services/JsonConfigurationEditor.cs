@@ -59,7 +59,10 @@ public sealed class JsonConfigurationEditor(
     /// <summary>
     /// Retrieves the configuration file path based on the specified configuration scope.
     /// </summary>
-    /// <param name="scope">The configuration scope indicating which configuration file path to retrieve (e.g., Global, System, or Local).</param>
+    /// <param name="scope">
+    /// The configuration scope indicating which configuration file path to retrieve (e.g., Global, System, or
+    /// Local).
+    /// </param>
     /// <returns>The full path of the configuration file as a string.</returns>
     /// <exception cref="ArgumentException">Thrown when the provided scope is invalid or unsupported.</exception>
     private string GetConfigFilePath(ConfigurationScope scope)
@@ -92,7 +95,8 @@ public sealed class JsonConfigurationEditor(
     /// Ensures that the directory for the specified file path exists. If the directory does not exist, it is created.
     /// </summary>
     /// <param name="filePath">
-    /// The path of the file whose directory needs to be ensured. The directory of the specified path will be created if it doesn't exist.
+    /// The path of the file whose directory needs to be ensured. The directory of the specified path will be created if it doesn't
+    /// exist.
     /// </param>
     /// <remarks>
     /// The method does not create the file itself; it only ensures the directory exists.
@@ -108,12 +112,13 @@ public sealed class JsonConfigurationEditor(
     }
 
     /// <summary>
-    /// Loads a JSON file from the specified path and ensures it contains an "AppSettings" key with a valid <see cref="JsonObject"/>.
+    /// Loads a JSON file from the specified path and ensures it contains an "AppSettings" key with a valid <see cref="JsonObject" />.
     /// If the file doesn't exist, it returns an empty JSON object with the "AppSettings" key instead.
     /// </summary>
     /// <param name="filePath">The path to the JSON file to load.</param>
     /// <returns>
-    /// A <see cref="JsonObject"/> representing the content of the file. If the file does not exist or is invalid, an empty <see cref="JsonObject"/>
+    /// A <see cref="JsonObject" /> representing the content of the file. If the file does not exist or is invalid, an empty
+    /// <see cref="JsonObject" />
     /// with the "AppSettings" key is returned.
     /// </returns>
     private JsonObject LoadFile(string filePath)
@@ -179,10 +184,8 @@ public sealed class JsonConfigurationEditor(
     /// </summary>
     /// <param name="settingKey">The full setting key path.</param>
     /// <returns>The last segment of the setting key path.</returns>
-    private static string GetFinalKeyPart(string? settingKey)
-    {
-        return settingKey?.Split('.', StringSplitOptions.RemoveEmptyEntries)[^1] ?? string.Empty;
-    }
+    private static string GetFinalKeyPart(string? settingKey) =>
+        settingKey?.Split('.', StringSplitOptions.RemoveEmptyEntries)[^1] ?? string.Empty;
 
     /// <summary>
     /// Parses the input string value into the appropriate JSON type.

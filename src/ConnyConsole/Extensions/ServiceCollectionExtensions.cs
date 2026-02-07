@@ -32,7 +32,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<AppSettings>(configuration.GetSection(AppSettings.SectionName));
-        services.Configure<CancellationSettings>(configuration.GetSection($"{AppSettings.SectionName}:{CancellationSettings.SectionName}"));
+        services.Configure<CancellationSettings>(
+            configuration.GetSection($"{AppSettings.SectionName}:{CancellationSettings.SectionName}"));
 
         return services;
     }

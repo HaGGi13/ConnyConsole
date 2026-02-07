@@ -5,9 +5,9 @@ namespace ConnyConsole.Cli.Log;
 
 public sealed class LogCommand : Command
 {
+    private readonly CategoryOption _categoryOption;
     private readonly ILogService _logService;
     private readonly MessageArgument _messageArgument;
-    private readonly CategoryOption _categoryOption;
 
     public LogCommand(MessageArgument messageArgument, CategoryOption categoryOption, ILogService logService)
         : base("log", "Writes a message to the logs.")

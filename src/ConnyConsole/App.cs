@@ -8,12 +8,11 @@ namespace ConnyConsole;
 
 public sealed class App : IApp
 {
+    public const string Name = "ConnyConsole";
     private readonly CancellationSettings _cancellationSettings;
     private readonly ConsoleCancellationTokenSource _consoleCancellationTokenSource;
-    private readonly CliRootCommand _rootCommand;
     private readonly ILogger<App> _logger;
-
-    public const string Name = "ConnyConsole";
+    private readonly CliRootCommand _rootCommand;
 
     public App(IOptions<CancellationSettings> cancellationSettings, ConsoleCancellationTokenSource consoleCancellationTokenSource,
         CliRootCommand rootCommand, ILogger<App> logger)

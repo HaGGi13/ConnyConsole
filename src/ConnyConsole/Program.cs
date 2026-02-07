@@ -23,16 +23,16 @@ try
             var fileSystem = new FileSystem();
 
             var systemConfiguration = new SystemConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
-            hostConfig.AddJsonFile(systemConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile(systemConfiguration.GetConfigFilePath(), true, true);
 
             var globalConfiguration = new GlobalConfiguration(fileSystem, SystemEnvironmentProvider.Instance);
-            hostConfig.AddJsonFile(globalConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile(globalConfiguration.GetConfigFilePath(), true, true);
 
             var localConfiguration = new LocalConfiguration(fileSystem);
-            hostConfig.AddJsonFile(localConfiguration.GetConfigFilePath(), optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile(localConfiguration.GetConfigFilePath(), true, true);
 
-            hostConfig.AddJsonFile("Config/loggersettings.json", optional: true, reloadOnChange: true);
-            hostConfig.AddJsonFile($"Config/loggersettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            hostConfig.AddJsonFile("Config/loggersettings.json", true, true);
+            hostConfig.AddJsonFile($"Config/loggersettings.{env.EnvironmentName}.json", true, true);
         })
         .ConfigureServices((hostContext, services) =>
         {

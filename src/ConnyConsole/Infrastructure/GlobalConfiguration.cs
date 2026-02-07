@@ -9,8 +9,8 @@ public sealed class GlobalConfiguration : IConfigurationPathProvider
 {
     private const string GlobalConfigFileName = ".connyconfig";
 
-    private readonly IFileSystem _fileSystem;
     private readonly IEnvironmentProvider _environmentProvider;
+    private readonly IFileSystem _fileSystem;
 
     private string? _globalConfigFilePath;
 
@@ -32,7 +32,7 @@ public sealed class GlobalConfiguration : IConfigurationPathProvider
 
     /// <summary>
     /// Returns the global (user-level) configuration file's full path.
-    /// It's in the <see cref="Environment.SpecialFolder.UserProfile"/> folder.
+    /// It's in the <see cref="Environment.SpecialFolder.UserProfile" /> folder.
     /// <para>On Windows, for instance: "C:\Users\&lt;userprofile&gt;\.connyconfig"</para>
     /// </summary>
     /// <returns>The full file path.</returns>

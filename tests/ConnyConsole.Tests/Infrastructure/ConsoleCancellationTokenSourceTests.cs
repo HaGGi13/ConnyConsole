@@ -8,8 +8,8 @@ namespace ConnyConsole.Tests.Infrastructure;
 
 public class ConsoleCancellationTokenSourceTests
 {
-    private readonly FakeLogger<ConsoleCancellationTokenSource> _logger = new();
     private readonly IEnvironmentProvider _environmentProvider = Substitute.For<IEnvironmentProvider>();
+    private readonly FakeLogger<ConsoleCancellationTokenSource> _logger = new();
 
     [Fact]
     public void CreateCancellationHandler_ShouldLogsMessageAndExit_WhenOneInterruptWithTimeout()
@@ -86,6 +86,18 @@ public class ConsoleCancellationTokenSourceTests
         logMessages[^1].Message.Should().Be("Second interrupt received, force-closing the app");
     }
 
+    #region Helper methids
+
+    private static ConsoleCancelEventArgs CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
+    {
+        var consoleCancelEventArgsType = typeof(ConsoleCancelEventArgs);
+        var constructor = consoleCancelEventArgsType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+
+        return (ConsoleCancelEventArgs)constructor.Invoke([key]);
+    }
+
+    #endregion
+
     #region Timeout handling
 
     [Fact]
@@ -128,18 +140,6 @@ public class ConsoleCancellationTokenSourceTests
 
         // Assert
         handler.Should().NotThrow<ArgumentOutOfRangeException>();
-    }
-
-    #endregion
-
-    #region Helper methids
-
-    private static ConsoleCancelEventArgs CreateConsoleCancelEventArgs(ConsoleSpecialKey key)
-    {
-        var consoleCancelEventArgsType = typeof(ConsoleCancelEventArgs);
-        var constructor = consoleCancelEventArgsType.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
-
-        return (ConsoleCancelEventArgs)constructor.Invoke([key]);
     }
 
     #endregion

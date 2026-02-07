@@ -2,7 +2,7 @@
 
 namespace ConnyConsole.Services;
 
-/// <inheritdoc cref="ILogService"/>
+/// <inheritdoc cref="ILogService" />
 public sealed class LogService(ILogger<LogService> logger) : ILogService
 {
     private const string MessageTemplate = "{Message}";

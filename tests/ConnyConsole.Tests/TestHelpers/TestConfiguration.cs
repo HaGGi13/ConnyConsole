@@ -5,6 +5,28 @@ namespace ConnyConsole.Tests.TestHelpers;
 
 public static class TestConfiguration
 {
+    public const string ConfigurationWithEmptySerilog =
+        """
+        {
+          "Serilog": {
+          },
+          "AppSettings": {
+            "LoopOutputInterval": "00:00:02",
+            "CancellationTimeout": "00:00:03"
+          }
+        }
+        """;
+
+    public const string ConfigurationWithoutSerilog =
+        """
+        {
+          "AppSettings": {
+            "LoopOutputInterval": "00:00:02",
+            "CancellationTimeout": "00:00:03"
+          }
+        }
+        """;
+
     private const string CompleteConfiguration =
         """
         {
@@ -41,28 +63,6 @@ public static class TestConfiguration
               "Application": "ConnyConsole"
             }
           },
-          "AppSettings": {
-            "LoopOutputInterval": "00:00:02",
-            "CancellationTimeout": "00:00:03"
-          }
-        }
-        """;
-
-    public const string ConfigurationWithEmptySerilog =
-        """
-        {
-          "Serilog": {
-          },
-          "AppSettings": {
-            "LoopOutputInterval": "00:00:02",
-            "CancellationTimeout": "00:00:03"
-          }
-        }
-        """;
-
-    public const string ConfigurationWithoutSerilog =
-        """
-        {
           "AppSettings": {
             "LoopOutputInterval": "00:00:02",
             "CancellationTimeout": "00:00:03"
