@@ -9,8 +9,8 @@ public sealed class SystemConfiguration : IConfigurationPathProvider
 {
     private const string SystemConfigFileName = "config";
 
-    private readonly IFileSystem _fileSystem;
     private readonly IEnvironmentProvider _environmentProvider;
+    private readonly IFileSystem _fileSystem;
 
     private string? _systemConfigFilePath;
 
@@ -32,7 +32,7 @@ public sealed class SystemConfiguration : IConfigurationPathProvider
 
     /// <summary>
     /// Returns the system configuration file's full path.
-    /// It's in an app-specific subfolder located in the <see cref="Environment.SpecialFolder.CommonApplicationData"/> folder.
+    /// It's in an app-specific subfolder located in the <see cref="Environment.SpecialFolder.CommonApplicationData" /> folder.
     /// <para>On Windows, for instance: "C:\ProgramData\ConnyConsole\config"</para>
     /// </summary>
     /// <returns>The full file path.</returns>

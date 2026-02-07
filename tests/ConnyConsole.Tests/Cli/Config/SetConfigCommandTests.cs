@@ -9,14 +9,14 @@ namespace ConnyConsole.Tests.Cli.Config;
 
 public class SetConfigCommandTests
 {
+    private readonly SetConfigCommand _command;
+    private readonly IConfigurationEditor _configEditor;
+    private readonly GlobalOption _globalOption;
+    private readonly LocalOption _localOption;
+    private readonly FakeLogger<SetConfigCommand> _logger;
     private readonly SettingKeyArgument _settingKey;
     private readonly SettingValueArgument _settingValue;
-    private readonly LocalOption _localOption;
-    private readonly GlobalOption _globalOption;
     private readonly SystemOption _systemOption;
-    private readonly IConfigurationEditor _configEditor;
-    private readonly FakeLogger<SetConfigCommand> _logger;
-    private readonly SetConfigCommand _command;
 
     public SetConfigCommandTests()
     {
@@ -29,15 +29,13 @@ public class SetConfigCommandTests
         _configEditor = Substitute.For<IConfigurationEditor>();
         _logger = new FakeLogger<SetConfigCommand>();
 
-        _command = new SetConfigCommand(
-            _settingKey,
+        _command = new SetConfigCommand(_settingKey,
             _settingValue,
             _localOption,
             _globalOption,
             _systemOption,
             _configEditor,
-            _logger
-        );
+            _logger);
     }
 
     [Fact]
@@ -62,7 +60,8 @@ public class SetConfigCommandTests
     [InlineData(false, true, false, ConfigurationScope.System)]
     [InlineData(false, false, true, ConfigurationScope.Local)] // Default case
     [InlineData(false, false, false, ConfigurationScope.Local)] // Default case
-    public void Handle_ValidScenarios_CallsConfigEditor(bool isGlobal, bool isSystem, bool isLocal, ConfigurationScope expectedScope)
+    public void Handle_ValidScenarios_CallsConfigEditor(bool isGlobal, bool isSystem, bool isLocal,
+        ConfigurationScope expectedScope)
     {
         // Arrange
         const string key = "Cancellation.Timeout";

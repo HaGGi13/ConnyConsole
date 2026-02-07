@@ -7,13 +7,13 @@ namespace ConnyConsole.Tests.Infrastructure;
 
 public sealed class GlobalConfigurationTests
 {
-    private const string TestUserProfilePath = @"C:\Users\TestUser";
     private const string ConfigFileName = ".connyconfig";
+    private const string TestUserProfilePath = @"C:\Users\TestUser";
+    private readonly IEnvironmentProvider _environment;
 
     private readonly string _expectedFilePath;
 
     private readonly MockFileSystem _fileSystem;
-    private readonly IEnvironmentProvider _environment;
 
     public GlobalConfigurationTests()
     {

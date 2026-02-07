@@ -2,7 +2,7 @@
 
 namespace ConnyConsole.Infrastructure;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public class ConsoleCancellationTokenSource(
     ILogger<ConsoleCancellationTokenSource> logger,
     IEnvironmentProvider environmentProvider)
@@ -11,12 +11,15 @@ public class ConsoleCancellationTokenSource(
     private bool _isGracefulCancelled = true;
 
     /// <summary>
-    /// Creates a <see cref="ConsoleCancelEventHandler"/> for a gracefully (first Ctrl+C) or forced (second Ctrl+C) application exit.
-    /// It can be registered on the <see cref="Console.CancelKeyPress"/> event.
+    /// Creates a <see cref="ConsoleCancelEventHandler" /> for a gracefully (first Ctrl+C) or forced (second Ctrl+C) application exit.
+    /// It can be registered on the <see cref="Console.CancelKeyPress" /> event.
     /// </summary>
     /// <param name="timeout">The timeout after which the app is forcibly terminated.</param>
-    /// <returns>The configured <see cref="ConsoleCancelEventHandler"/> event.</returns>
-    /// <remarks>This method is based on https://medium.com/@sawyer.watts/a-beginners-guide-to-net-s-hostbuilder-part-2-cancellation-857ae3e6ff02</remarks>
+    /// <returns>The configured <see cref="ConsoleCancelEventHandler" /> event.</returns>
+    /// <remarks>
+    /// This method is based on
+    /// https://medium.com/@sawyer.watts/a-beginners-guide-to-net-s-hostbuilder-part-2-cancellation-857ae3e6ff02
+    /// </remarks>
     public ConsoleCancelEventHandler CreateCancellationHandler(TimeSpan timeout)
     {
         if (timeout < TimeSpan.Zero)
@@ -59,11 +62,10 @@ public class ConsoleCancellationTokenSource(
 
         if (timeoutInMilliseconds > 0)
         {
-            _ = new Timer(
-                _ => LogAndExit(),
-                state: null,
-                dueTime: timeoutInMilliseconds,
-                period: 0);
+            _ = new Timer(_ => LogAndExit(),
+                null,
+                timeoutInMilliseconds,
+                0);
         }
         else
         {

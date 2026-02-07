@@ -6,9 +6,9 @@ namespace ConnyConsole.Tests.Infrastructure;
 
 public sealed class LocalConfigurationTests
 {
-    private const string CurrentDirectory = @"C:\Temp";
     private const string ConfigDirectoryName = ".connyconsole";
     private const string ConfigFileName = "config";
+    private const string CurrentDirectory = @"C:\Temp";
 
     private readonly string _expectedFilePath;
     private readonly MockFileSystem _fileSystem;

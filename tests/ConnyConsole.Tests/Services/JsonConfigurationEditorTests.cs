@@ -9,16 +9,16 @@ namespace ConnyConsole.Tests.Services;
 
 public class JsonConfigurationEditorTests
 {
-    private const string SystemConfigPath = @"C:\ProgramData\ConnyConsole\config";
     private const string GlobalConfigPath = @"C:\Users\TestUser\.connyconfig";
     private const string LocalConfigPath = @"C:\Temp\.connyconsole\config";
-
-    private readonly IConfigurationPathProvider _globalConfiguration;
-    private readonly IConfigurationPathProvider _systemConfiguration;
-    private readonly IConfigurationPathProvider _localConfiguration;
+    private const string SystemConfigPath = @"C:\ProgramData\ConnyConsole\config";
+    private readonly JsonConfigurationEditor _configEditor;
 
     private readonly MockFileSystem _fileSystem;
-    private readonly JsonConfigurationEditor _configEditor;
+
+    private readonly IConfigurationPathProvider _globalConfiguration;
+    private readonly IConfigurationPathProvider _localConfiguration;
+    private readonly IConfigurationPathProvider _systemConfiguration;
 
     public JsonConfigurationEditorTests()
     {
@@ -231,12 +231,15 @@ public class JsonConfigurationEditorTests
     #region Helper methods
 
     /// <summary>
-    /// Retrieves the file path for a given configuration scope based on the specified <see cref="ConfigurationScope"/>.
+    /// Retrieves the file path for a given configuration scope based on the specified <see cref="ConfigurationScope" />.
     /// </summary>
-    /// <param name="scope">The configuration scope for which the file path is to be retrieved. Possible values are <see cref="ConfigurationScope.Local"/>, <see cref="ConfigurationScope.Global"/>,
-    /// <see cref="ConfigurationScope.System"/>, or <see cref="ConfigurationScope.Unspecified"/>.</param>
+    /// <param name="scope">
+    /// The configuration scope for which the file path is to be retrieved. Possible values are <see cref="ConfigurationScope.Local" />,
+    /// <see cref="ConfigurationScope.Global" />,
+    /// <see cref="ConfigurationScope.System" />, or <see cref="ConfigurationScope.Unspecified" />.
+    /// </param>
     /// <returns>The full file path for the specified configuration scope.</returns>
-    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified"/>.</exception>
+    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified" />.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the passed configuration scope value is not supported.</exception>
     private string GetScopedConfigFilePath(ConfigurationScope scope) => scope switch
     {
@@ -248,11 +251,11 @@ public class JsonConfigurationEditorTests
     };
 
     /// <summary>
-    /// Retrieves the directory path for a given configuration scope based on the specified <see cref="ConfigurationScope"/>.
+    /// Retrieves the directory path for a given configuration scope based on the specified <see cref="ConfigurationScope" />.
     /// </summary>
     /// <param name="scope">The configuration scope for which the directory path is to be retrieved.</param>
     /// <returns>The full directory path for the specified configuration scope.</returns>
-    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified"/>.</exception>
+    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified" />.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the passed configuration scope value is not supported.</exception>
     private string GetScopedConfigDirectoryPath(ConfigurationScope scope)
     {
@@ -262,11 +265,11 @@ public class JsonConfigurationEditorTests
     }
 
     /// <summary>
-    /// Retrieves the content of the configuration file for the specified <see cref="ConfigurationScope"/>.
+    /// Retrieves the content of the configuration file for the specified <see cref="ConfigurationScope" />.
     /// </summary>
     /// <param name="scope">The configuration scope for which the file content is to be retrieved.</param>
     /// <returns>The full content of the configuration file as a string for the specified scope.</returns>
-    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified"/>.</exception>
+    /// <exception cref="ArgumentException">Thrown when the configuration scope is <see cref="ConfigurationScope.Unspecified" />.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when a configuration scope value is provided that is not supported.</exception>
     /// <exception cref="FileNotFoundException">Thrown when the config file for the specified scope does not exist.</exception>
     /// <exception cref="IOException">Thrown when there is an error accessing the config file.</exception>
