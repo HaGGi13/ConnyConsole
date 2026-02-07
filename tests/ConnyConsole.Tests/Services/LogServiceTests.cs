@@ -226,7 +226,7 @@ public class LogServiceTests
     {
         // Arrange
         var logService = new LogService(_logger);
-        var message = $"   {TestMessage}   ";
+        const string message = $"   {TestMessage}   ";
 
         // Act
         logService.Log(LogLevel.Information, message);

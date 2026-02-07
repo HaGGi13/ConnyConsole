@@ -3,7 +3,7 @@
 namespace ConnyConsole.Infrastructure;
 
 /// <inheritdoc />
-public class ConsoleCancellationTokenSource(
+public partial class ConsoleCancellationTokenSource(
     ILogger<ConsoleCancellationTokenSource> logger,
     IEnvironmentProvider environmentProvider)
     : CancellationTokenSource
@@ -31,9 +31,7 @@ public class ConsoleCancellationTokenSource(
         {
             if (_isGracefulCancelled)
             {
-                logger.LogInformation(
-                    "Received interrupt signal, attempting to shut down gracefully but will force-close in {Seconds} seconds. Send again to immediately force-close.",
-                    timeout.TotalSeconds);
+                LogGracefulShutdownInitiated(timeout.TotalSeconds);
 
                 Cancel();
                 cancelEvent.Cancel = true;
@@ -43,7 +41,7 @@ public class ConsoleCancellationTokenSource(
             }
             else
             {
-                logger.LogInformation("Second interrupt received, force-closing the app");
+                LogForceShutdownInitiated();
                 ExitApplication();
             }
         };
@@ -54,12 +52,6 @@ public class ConsoleCancellationTokenSource(
     /// </summary>
     private void EnforceExitAfterTimeout(int timeoutInMilliseconds)
     {
-        void LogAndExit()
-        {
-            logger.LogInformation("Timeout reached, force-closing app.");
-            ExitApplication();
-        }
-
         if (timeoutInMilliseconds > 0)
         {
             _ = new Timer(_ => LogAndExit(),
@@ -70,6 +62,14 @@ public class ConsoleCancellationTokenSource(
         else
         {
             LogAndExit();
+        }
+
+        return;
+
+        void LogAndExit()
+        {
+            LogForceShutdownAfterTimeout();
+            ExitApplication();
         }
     }
 
