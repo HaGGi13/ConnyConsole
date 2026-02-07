@@ -65,15 +65,10 @@ public sealed class JsonConfigurationEditor(
     /// </param>
     /// <returns>The full path of the configuration file as a string.</returns>
     /// <exception cref="ArgumentException">Thrown when the provided scope is invalid or unsupported.</exception>
-    private string GetConfigFilePath(ConfigurationScope scope)
-    {
-        if (!_configurationHandlers.TryGetValue(scope, out var configurationPathHandler))
-        {
-            throw new ArgumentException($"Unsupported configuration scope: {scope}", nameof(scope));
-        }
-
-        return configurationPathHandler(fileSystem);
-    }
+    private string GetConfigFilePath(ConfigurationScope scope) =>
+        _configurationHandlers.TryGetValue(scope, out var configurationPathHandler)
+            ? configurationPathHandler(fileSystem)
+            : throw new ArgumentException($"Unsupported configuration scope: {scope}", nameof(scope));
 
     /// <summary>
     /// Validates the input setting key for null/whitespace and supported format.

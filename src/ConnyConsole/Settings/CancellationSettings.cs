@@ -6,6 +6,5 @@ public class CancellationSettings
 {
     public const string SectionName = "Cancellation";
 
-    [JsonPropertyName("Timeout")]
-    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(3);
+    [JsonPropertyName("Timeout")] public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(3);
 }
